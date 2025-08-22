@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Faculty Dashboard - Smart Attendance</title>
+  <title>Faculty Dashboard</title>
   <link rel="stylesheet" href="/Frontend/CSS/faculty.css" />
 </head>
 <body>
@@ -20,11 +20,11 @@
   <main>
     <section id="studentManagement" style="display:none;">
       <h2>Student Management</h2>
-      <form id="addStudentForm">
+      <form id="addStudentForm" action="" method="get" >
         <input type="text" id="studentName" placeholder="Student Name" required />
         <input type="email" id="studentEmail" placeholder="Student Email" required />
         <input type="file" id="studentPhoto" accept="image/*" required />
-        <button type="submit">Add Student</button>
+        <input type="submit">Add Student</input>
       </form>
       <div id="studentList"></div>
     </section>
