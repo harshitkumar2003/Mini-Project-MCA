@@ -1,11 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faculty</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Faculty Dashboard - Smart Attendance</title>
+  <link rel="stylesheet" href="/Frontend/CSS/faculty.css" />
 </head>
 <body>
-    
+  <header>
+    <h1>Faculty Dashboard</h1>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="attendance.html">Mark Attendance</a></li>
+      <li><a href="#" id="manageStudents">Manage Students</a></li>
+      <li><a href="#" id="logout">Logout</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section id="studentManagement" style="display:none;">
+      <h2>Student Management</h2>
+      <form id="addStudentForm">
+        <input type="text" id="studentName" placeholder="Student Name" required />
+        <input type="email" id="studentEmail" placeholder="Student Email" required />
+        <input type="file" id="studentPhoto" accept="image/*" required />
+        <button type="submit">Add Student</button>
+      </form>
+      <div id="studentList"></div>
+    </section>
+  </main>
+
+  <script src="js/faculty.js"></script>
 </body>
 </html>
