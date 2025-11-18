@@ -1,0 +1,305 @@
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+
+# --- GLOBAL STYLES ---
+<Label>:
+    color: get_color_from_hex("#333333")
+
+<RoundedBoxLayout>:
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: self.radius
+
+# --- SEARCH BAR ---
+<SearchBar>:
+    size_hint_y: None
+    height: dp(50)
+    background_color: get_color_from_hex("#FFFFFF")
+    radius: [dp(10)]
+    padding: [dp(10), 0]
+    spacing: dp(10)
+    
+    Label:
+        text: "🔍"
+        font_size: '18sp'
+        size_hint_x: None
+        width: dp(30)
+        color: get_color_from_hex("#888888")
+    
+    TextInput:
+        hint_text: "Search Patient"
+        background_color: 0,0,0,0
+        foreground_color: get_color_from_hex("#333333")
+        cursor_color: get_color_from_hex("#333333")
+        multiline: False
+        font_size: '16sp'
+        # Center text vertically trick
+        padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+        
+    Label:
+        text: "🎚️"
+        font_size: '18sp'
+        size_hint_x: None
+        width: dp(30)
+        color: get_color_from_hex("#888888")
+
+# --- ALERT CARD ---
+<AlertCard>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: dp(90)
+    radius: [dp(15)]
+    background_color: get_color_from_hex("#E74C3C")
+    padding: dp(15)
+    spacing: dp(5)
+
+    BoxLayout:
+        size_hint_y: None
+        height: dp(20)
+        spacing: dp(10)
+        Label:
+            text: "🔔"
+            font_size: '16sp'
+            size_hint_x: None
+            width: dp(20)
+        Label:
+            text: "Urgent Alerts"
+            font_size: '16sp'
+            bold: True
+            color: 1, 1, 1, 1
+            halign: 'left'
+            text_size: self.size
+
+    Label:
+        text: "CRITICAL: Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        font_size: '12sp'
+        color: 1, 1, 1, 1
+        text_size: self.size
+        halign: 'left'
+        valign: 'top'
+
+# --- APPOINTMENT ITEMS ---
+<AppointmentItem>:
+    size_hint_y: None
+    height: dp(50)
+    spacing: dp(10)
+    
+    Label:
+        text: root.icon
+        font_size: '24sp'
+        size_hint_x: None
+        width: dp(30)
+        color: get_color_from_hex("#3498DB")
+        
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: root.name
+            halign: 'left'
+            text_size: self.size
+            valign: 'bottom'
+        Label:
+            text: root.time
+            font_size: '12sp'
+            color: get_color_from_hex("#888888")
+            halign: 'left'
+            text_size: self.size
+            valign: 'top'
+
+    # Tags Container
+    BoxLayout:
+        size_hint_x: None
+        width: dp(80)
+        spacing: dp(5)
+        padding: [0, dp(10)]
+        
+        RoundedBoxLayout:
+            radius: [dp(8)]
+            background_color: get_color_from_hex("#E0EFFF")
+            size_hint: None, None
+            size: dp(45), dp(25)
+            Label:
+                text: "18.6M"
+                font_size: '10sp'
+                color: get_color_from_hex("#3498DB")
+                
+        RoundedBoxLayout:
+            radius: [dp(8)]
+            background_color: get_color_from_hex("#E0EFFF")
+            size_hint: None, None
+            size: dp(25), dp(25)
+            Label:
+                text: "$"
+                font_size: '10sp'
+                color: get_color_from_hex("#3498DB")
+
+<AppointmentsSection>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: dp(10)
+    
+    Label:
+        text: "Upcoming Appointments"
+        font_size: '20sp'
+        bold: True
+        size_hint_y: None
+        height: dp(30)
+        halign: 'left'
+        text_size: self.size
+
+    BoxLayout:
+        id: appt_container
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: dp(10)
+
+# --- VITALS SECTION ---
+<VitalsSection>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: dp(10)
+    # IMPORTANT: This triggers the python function to add graphs
+    on_parent: self.add_graphs() 
+
+    Label:
+        text: "Patient Vitals Overview"
+        font_size: '20sp'
+        bold: True
+        size_hint_y: None
+        height: dp(30)
+        halign: 'left'
+        text_size: self.size
+    
+    GridLayout:
+        cols: 2
+        spacing: dp(15)
+        size_hint_y: None
+        height: dp(180)
+        
+        # Heart Rate Card
+        RoundedBoxLayout:
+            orientation: 'vertical'
+            padding: dp(10)
+            radius: [dp(10)]
+            Label:
+                text: "Avg BPM"
+                font_size: '12sp'
+                color: get_color_from_hex("#AAAAAA")
+                size_hint_y: None
+                height: dp(15)
+                halign: 'left'
+                text_size: self.size
+            # This ID allows Python to inject the graph here
+            BoxLayout:
+                id: hr_container
+            Label:
+                text: "Heart Rate"
+                font_size: '12sp'
+                color: get_color_from_hex("#AAAAAA")
+                size_hint_y: None
+                height: dp(15)
+
+        # Blood Pressure Card
+        RoundedBoxLayout:
+            orientation: 'vertical'
+            padding: dp(10)
+            radius: [dp(10)]
+            Label:
+                text: "Blood Pressure"
+                font_size: '12sp'
+                color: get_color_from_hex("#AAAAAA")
+                size_hint_y: None
+                height: dp(15)
+                halign: 'left'
+                text_size: self.size
+            # This ID allows Python to inject the graph here
+            BoxLayout:
+                id: bp_container
+
+# --- LAB ITEMS ---
+<LabItem>:
+    size_hint_y: None
+    height: dp(50)
+    spacing: dp(10)
+
+    RoundedBoxLayout:
+        size_hint: None, None
+        size: dp(40), dp(40)
+        radius: [dp(20)]
+        background_color: get_color_from_hex("#E0EFFF")
+        pos_hint: {'center_y': 0.5}
+        Label:
+            text: "+"
+            font_size: '24sp'
+            color: get_color_from_hex("#3498DB")
+            halign: 'center'
+            valign: 'middle'
+
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: root.title
+            halign: 'left'
+            text_size: self.size
+            valign: 'bottom'
+        Label:
+            text: root.subtitle
+            font_size: '12sp'
+            color: get_color_from_hex("#888888")
+            halign: 'left'
+            text_size: self.size
+            valign: 'top'
+
+    Label:
+        text: "FEI - 0.9%\nMMI 11.10.11"
+        font_size: '12sp'
+        halign: 'right'
+        valign: 'middle'
+        text_size: self.size
+        color: get_color_from_hex("#555555")
+
+<LabsSection>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: dp(10)
+    
+    Label:
+        text: "Recent Lab Results"
+        font_size: '20sp'
+        bold: True
+        size_hint_y: None
+        height: dp(30)
+        halign: 'left'
+        text_size: self.size
+
+    BoxLayout:
+        id: lab_container
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: dp(10)
+
+
+# --- MAIN ROOT ---
+<DashboardRoot>:
+    do_scroll_x: False
+    
+    GridLayout:
+        cols: 1
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: dp(20)
+        padding: dp(15)
+        
+        SearchBar:
+        AlertCard:
+        AppointmentsSection:
+        VitalsSection:
+        LabsSection:
