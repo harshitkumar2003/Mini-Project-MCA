@@ -12,7 +12,7 @@ class HomeDashboardScreen(Screen):
         plot.points = [(x, (x * 2 + 5) % 100) for x in range(40)]
         graph.add_plot(plot)
         
-        # Update other widgets dynamically here
+        # Update other widgets dynamically here 
         self.ids.appointments_card.value = "3"
         self.ids.reports_card.value = "7"
         self.ids.doctors_card.value = "2"
