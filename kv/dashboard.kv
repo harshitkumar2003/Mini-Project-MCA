@@ -17,7 +17,7 @@
             Image:
                 source: "assets/logo2.png"
                 size_hint_x: None
-                width: 120
+                width: 150
                 allow_stretch: True
                 keep_ratio: True
 
@@ -30,10 +30,11 @@
                 background_normal: ""
                 background_color: 0.9, 0.1, 0.1, 1
                 on_release:
-                    app.root.current = 'login_view'
+                    app.root.get_screen('login').reset_fields()
+                    app.root.current = 'login'
 
         ScrollView:
-            do_scroll_x: False
+            do_scroll_x: True
 
             BoxLayout:
                 orientation: 'vertical'
@@ -45,25 +46,25 @@
                 BoxLayout:
                     spacing: 16
                     size_hint_y: None
-                    height: 120
+                    height: 200
 
                     InfoCard:
                         id: appointments_card
                         title: "Appointments"
                         value: "0"
-                        icon_source: "assets/calendar_icon.png"
+                        icon_source: "assets/calendar.jpg"
 
                     InfoCard:
                         id: reports_card
                         title: "Reports"
                         value: "0"
-                        icon_source: "assets/report_icon.png"
+                        icon_source: "assets/report.png"
 
                     InfoCard:
                         id: doctors_card
                         title: "Doctors"
                         value: "0"
-                        icon_source: "assets/doctor_icon.png"
+                        icon_source: "assets/doctor.png"
 
                 BoxLayout:
                     size_hint_y: None

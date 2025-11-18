@@ -13,6 +13,6 @@ class HomeDashboardScreen(Screen):
         graph.add_plot(plot)
         
         # Update other widgets dynamically here
-        self.ids.appointments_card.value = "7"
-        self.ids.reports_card.value = "15"
-        self.ids.doctors_card.value = "4"
+        self.ids.appointments_card.value = "3"
+        self.ids.reports_card.value = "7"
+        self.ids.doctors_card.value = "2"

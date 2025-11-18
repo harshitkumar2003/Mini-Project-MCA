@@ -181,3 +181,10 @@ class LoginSignupScreen(Screen):
     def show_popup(self, title, message):
         Popup(title=title, content=Label(text=message),
               size_hint=(0.6, 0.4)).open()
+    
+    def reset_fields(self):
+        self.ids.adhar_input.text = ""
+        self.ids.password_input.text = ""
+        self.ids.role_spinner.text = "Select Role"  # or default value
+        # Reset other fields if required
+    
