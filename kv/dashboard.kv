@@ -44,27 +44,45 @@
                 spacing: 16
 
                 BoxLayout:
-                    spacing: 16
+                    spacing: 20
                     size_hint_y: None
-                    height: 200
+                    height: 170  # increased height for bigger cards
 
                     InfoCard:
                         id: appointments_card
                         title: "Appointments"
                         value: "0"
                         icon_source: "assets/calendar.jpg"
+                        size_hint: None, None
+                        width: self.parent.width / 4 - 20
+                        height: 170
 
                     InfoCard:
                         id: reports_card
                         title: "Reports"
                         value: "0"
                         icon_source: "assets/report.png"
+                        size_hint: None, None
+                        width: self.parent.width / 4 - 20
+                        height: 170
 
                     InfoCard:
                         id: doctors_card
                         title: "Doctors"
                         value: "0"
                         icon_source: "assets/doctor.png"
+                        size_hint: None, None
+                        width: self.parent.width / 4 - 20
+                        height: 170
+
+                    InfoCard:
+                        id: new_disease_card
+                        title: "New Disease"
+                        value: "0"
+                        icon_source: "assets/disease.png"
+                        size_hint: None, None
+                        width: self.parent.width / 4 - 20
+                        height: 170
 
                 BoxLayout:
                     size_hint_y: None
@@ -95,7 +113,7 @@
                         ymax: 100
 
 <InfoCard@BoxLayout>:
-    value: ''         # add this
+    value: ''         # property declarations to avoid attribute errors
     title: ''
     icon_source: ''
     orientation: 'vertical'
