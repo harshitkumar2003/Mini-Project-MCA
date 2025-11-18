@@ -16,7 +16,7 @@ from screens.login import LoginSignupScreen      #todo: login and signup functio
 #! Load KV files (make sure they are inside kv/ folder)
 Builder.load_file("kv/splash.kv")
 Builder.load_file("kv/login.kv")
-# Builder.load_file("kv/patient.kv")
+#
 # Builder.load_file("kv/doctor.kv")
 
 #! Global background color (white)
