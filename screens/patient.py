@@ -21,7 +21,7 @@ kivy.require('2.1.0')
 
 # --- FIX: LOAD KV FILE ROBUSTLY ---
 # This gets the directory where patient.py is located
-current_dir = os.path.dirname(os.path.abspath(__file__))
+current_dir = os.path.dirname(os.path.abspath("screens/patient.py"))
 # This combines the directory with the filename
 kv_file_path = os.path.join(current_dir, 'kv/patient.kv')
 
@@ -126,7 +126,7 @@ class PatientDashboardApp(App):
         # Set App Background Color
         Window.clearcolor = get_color_from_hex("#F7F7F9")
         # Simulate Mobile Size
-        Window.size = (400, 800)
+       # Window.size = (400, 800)
         return DashboardRoot()
 
 if __name__ == '__main__':

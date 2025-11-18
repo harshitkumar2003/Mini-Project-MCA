@@ -1,1 +1,4 @@
-Builder.load_file("kv/patient.kv")
+
+Window.clearcolor = get_color_from_hex("#ffffff")
+
+#! Screen Manager
