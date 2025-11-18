@@ -11,7 +11,7 @@ from screens.login import LoginSignupScreen      #todo: login and signup functio
 # from screens.doctor import DoctorScreen
 
 #! Output Screen Example: Mobile screen size (iPhone 14 approx)
-Window.size = (250, 540)  #! Width x Height in pixels
+#Window.size = (250, 540)  #! Width x Height in pixels
 
 #! Load KV files (make sure they are inside kv/ folder)
 Builder.load_file("kv/splash.kv")
