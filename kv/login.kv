@@ -11,9 +11,9 @@
                 rgba: 1, 1, 1, 1  # If you want a slight overlay, adjust alpha to e.g. 0.92
             # The illustration placed bottom left, covering ~45% width, ~60% height
             Rectangle:
-                source: "assets/login-illustration.png"
+                source: "assets/ill-1.png"
                 pos: self.x, self.y
-                size: self.width * 0.79, self.height * 0.7
+                size: self.width * 0.89, self.height * 1
 
         BoxLayout:
             id: card_box
@@ -21,7 +21,7 @@
             size_hint: None, None
             width: min(380, root.width * 0.93)
             height: min(650, root.height * 0.93)
-            pos_hint: {"center_x": 0.63, "center_y": 0.6}
+            pos_hint: {"center_x": 0.75, "center_y": 0.45}
             padding: [24, 32, 24, 24]  # More top padding for floating effect
             spacing: 16
 
@@ -35,7 +35,7 @@
                 opacity: 1
 
             Widget:
-                size_hint_y: None
+                size_hint_y: 0.3
                 height: 10
 
             ScreenManager:
