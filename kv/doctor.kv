@@ -1,6 +1,6 @@
 # Kivy 2.1.0
 
-# --- 1. Custom Widget Definitions ---
+# 1. Custom Widget Definitions
 # The style properties for RoundedBoxLayout are defined in Python, 
 # so we just define the base widget structure here.
 
@@ -35,11 +35,11 @@
         color: root.get_color_from_hex("#555555")
         size_hint_x: 0.3
 
-# --- 2. Main Layout Structure ---
+# 2. Main Layout Structure
 
-<ModernDoctorDashboard@BoxLayout>:
-    # This matches the root_layout in your Python build method
-    padding: root.dp(20)
+<DoctorScreen>:
+    BoxLayout:
+        padding: root.dp(20)
     
     # 2. Main Content Panel
     RoundedBoxLayout:
@@ -102,7 +102,7 @@
         BoxLayout:
             spacing: root.dp(20)
             
-            # --- Column 1: Appointments ---
+            # Column 1: Appointments
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_x: 0.3
@@ -138,7 +138,7 @@
                             AppointmentItem:
                             AppointmentItem:
 
-            # --- Column 2: Vitals ---
+            # Column 2: Vitals
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_x: 0.4
@@ -187,7 +187,7 @@
                         # Python will replace this with the Graph object
 
 
-            # --- Column 3: Results & Alerts ---
+            # Column 3: Results & Alerts
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_x: 0.3

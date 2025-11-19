@@ -13,6 +13,7 @@ from screens.login import LoginSignupScreen      #todo: login and signup functio
 from screens.dashboard import HomeDashboardScreen  #todo: user dashboard after login
 from screens.patient import PatientScreen
 from screens.doctor import DoctorScreen
+#from screens.admin import AdminScreen
 
 #! Output Screen Example: Mobile screen size (iPhone 14 approx)
 #Window.size = (250, 540)  #! Width x Height in pixels
@@ -28,6 +29,9 @@ Builder.load_file("kv/login.kv")
 Builder.load_file("kv/dashboard.kv")
 Builder.load_file("kv/patient.kv")
 Builder.load_file("kv/doctor.kv")
+#Builder.load_file("kv/admin.kv")
+
+
 
 #! Global background color (white)
 Window.clearcolor = get_color_from_hex("#ffffff")
@@ -41,6 +45,7 @@ class HealthcareApp(App):
         sm.add_widget(HomeDashboardScreen(name="dashboard"))
         sm.add_widget(PatientScreen(name="patient"))
         sm.add_widget(DoctorScreen(name="doctor"))
+        #sm.add_widget(AdminScreen(name="admin"))
         return sm
 
 

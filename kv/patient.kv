@@ -1,306 +1,220 @@
 #:import get_color_from_hex kivy.utils.get_color_from_hex
 #:import AsyncImage kivy.uix.image.AsyncImage
 
-# --- GLOBAL STYLES ---
-<Label>:
-    font_name: 'Roboto'
-    color: get_color_from_hex("#000000")
-
-# --- IOSCard (Rounded Background) ---
-<IOSCard>:
-    canvas.before:
-        Color:
-            rgba: self.bg_color
-        RoundedRectangle:
-            pos: self.pos
-            size: self.size
-            radius: self.radius
-
-# --- Circular Avatar (Clipping logic) ---
-<CircularAvatar>:
-    canvas.before:
-        StencilPush
-        RoundedRectangle:
-            pos: self.pos
-            size: self.size
-            radius: [self.size[0]/2.0]
-        StencilUse
-    canvas.after:
-        StencilUnUse
-        RoundedRectangle:
-            pos: self.pos
-            size: self.size
-            radius: [self.size[0]/2.0]
-        StencilPop
-
-# --- ActionButton (The Quick Actions Grid Item) ---
-<ActionButton>:
-    orientation: 'vertical'
-    size_hint: None, None
-    size: dp(75), dp(80)
-    spacing: dp(8)
-    
-    # Icon Circle (This is where the error was in the previous code)
-    BoxLayout:
-        size_hint: None, None
-        size: dp(50), dp(50)
-        pos_hint: {'center_x': 0.5}
-        canvas.before:
-            Color:
-                rgba: root.bg_color  # <-- THIS NOW WORKS because bg_color is defined in Python
-            RoundedRectangle:
-                pos: self.pos
-                size: self.size
-                radius: [dp(25)]
-        Label:
-            text: root.icon
-            font_size: '24sp'
-            color: root.icon_color # <-- This also works now
-            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-    
-    # Text
-    Label:
-        text: root.text
-        font_size: '11sp'
-        color: get_color_from_hex("#333333")
-        halign: 'center'
-
-<BottomNavItem>:
-    orientation: 'vertical'
-    size_hint_y: 1
-    spacing: dp(2)
-    Label:
-        text: root.icon
-        font_size: '22sp'
-        color: root.active_color if root.is_active else root.inactive_color
-    Label:
-        text: root.text
-        font_size: '10sp'
-        color: root.active_color if root.is_active else root.inactive_color
-
-# --- MAIN LAYOUT ---
-
-<FloatLayout>:
-    # Set ID for the scrollable content
-    DashboardScroll:
-        size_hint: 1, 1
-        size_hint_y: None
-        height: root.height - dp(80) 
-        pos_hint: {'top': 1}
-        
-        DashboardContent:
-            id: dashboard_content
-
-    # BOTTOM NAVIGATION BAR (Fixed)
-    BoxLayout:
-        size_hint_y: None
-        height: dp(80)
-        pos_hint: {'bottom': 1}
-        padding: [dp(20), dp(10), dp(20), dp(25)]
-        spacing: dp(10)
-        canvas.before:
-            Color:
-                rgba: get_color_from_hex("#FFFFFF")
-            Rectangle:
-                pos: self.pos
-                size: self.size
-            Color:
-                rgba: get_color_from_hex("#E5E5EA")
-            Line:
-                points: [self.x, self.y + self.height, self.x + self.width, self.y + self.height]
-                width: 1
-        
-        BottomNavItem:
-            icon: "🏠"
-            text: "Home"
-            is_active: True
-        BottomNavItem:
-            icon: "📅"
-            text: "Schedule"
-        BottomNavItem:
-            icon: "💬"
-            text: "Chat"
-        BottomNavItem:
-            icon: "👤"
-            text: "Profile"
-
-<DashboardContent>:
-    id: content_root
-    orientation: 'vertical'
-    size_hint_y: None
-    height: self.minimum_height
-    padding: [dp(20), dp(40), dp(20), dp(20)]
-    spacing: dp(20)
-
-    # --- HEADER ---
-    BoxLayout:
-        size_hint_y: None
-        height: dp(50)
-        spacing: dp(10)
-
-        BoxLayout:
-            orientation: 'vertical'
-            Label:
-                text: "Good Morning,"
-                font_size: '14sp'
-                color: get_color_from_hex("#8E8E93")
-                halign: 'left'
-                text_size: self.size
-            Label:
-                text: "Sarah Jenkins"
-                font_size: '24sp'
-                bold: True
-                halign: 'left'
-                text_size: self.size
-        
-        CircularAvatar:
-            source: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80'
-            size_hint: None, None
-            size: dp(50), dp(50)
-
-    # --- BANNER IMAGE ---
-    IOSCard:
-        size_hint_y: None
-        height: dp(140)
-        padding: 0
-        clip_to_layout: True
-
-        AsyncImage:
-            source: 'https://img.freepik.com/free-vector/flat-design-medical-center-landing-page_23-2148954368.jpg'
-            allow_stretch: True
-            keep_ratio: False
-            radius: [dp(18)]
-
-    # --- QUICK ACTIONS GRID ---
-    GridLayout:
-        cols: 4
-        size_hint_y: None
-        height: dp(90)
-        spacing: dp(10)
-
-        ActionButton:
-            text: "Doctor"
-            icon: "👨‍⚕️"
-            bg_color: get_color_from_hex("#E3F2FD")
-            icon_color: get_color_from_hex("#007AFF")
-
-        ActionButton:
-            text: "Pharmacy"
-            icon: "💊"
-            bg_color: get_color_from_hex("#FFF3E0")
-            icon_color: get_color_from_hex("#FF9500")
-
-        ActionButton:
-            text: "Hospital"
-            icon: "🏥"
-            bg_color: get_color_from_hex("#FFEBEE")
-            icon_color: get_color_from_hex("#FF3B30")
-
-        ActionButton:
-            text: "Ambulance"
-            icon: "🚑"
-            bg_color: get_color_from_hex("#E8F5E9")
-            icon_color: get_color_from_hex("#34C759")
-
-    # --- HEART RATE CARD (GRAPH) ---
-    Label:
-        text: "Health Vitals"
-        font_size: '18sp'
-        bold: True
-        size_hint_y: None
-        height: dp(30)
-        halign: 'left'
-        text_size: self.size
-
-    IOSCard:
-        orientation: 'vertical'
-        size_hint_y: None
-        height: dp(220)
-        padding: dp(15)
-        spacing: dp(10)
-
+<PatientScreen>:
+    FloatLayout:
+        # BOTTOM NAVIGATION BAR (Fixed)
         BoxLayout:
             size_hint_y: None
-            height: dp(30)
-            Label:
-                text: "Heart Rate"
-                font_size: '16sp'
-                bold: True
-                halign: 'left'
-                text_size: self.size
-            Label:
-                text: "72 BPM"
-                font_size: '16sp'
-                bold: True
-                color: get_color_from_hex("#FF2D55")
-                halign: 'right'
-                text_size: self.size
-        
-        # Graph Container (Filled by Python)
-        BoxLayout:
-            id: graph_container
-
-    # --- UPCOMING APPOINTMENT ---
-    Label:
-        text: "Upcoming Schedule"
-        font_size: '18sp'
-        bold: True
-        size_hint_y: None
-        height: dp(30)
-        halign: 'left'
-        text_size: self.size
-
-    IOSCard:
-        size_hint_y: None
-        height: dp(80)
-        padding: dp(15)
-        spacing: dp(15)
-        
-        # Date Box
-        BoxLayout:
-            orientation: 'vertical'
-            size_hint_x: None
-            width: dp(50)
+            height: dp(80)
+            pos_hint: {'bottom': 1}
+            padding: [dp(20), dp(10), dp(20), dp(25)]
+            spacing: dp(10)
             canvas.before:
                 Color:
-                    rgba: get_color_from_hex("#F2F2F7")
-                RoundedRectangle:
+                    rgba: get_color_from_hex("#FFFFFF")
+                Rectangle:
                     pos: self.pos
                     size: self.size
-                    radius: [dp(12)]
+                Color:
+                    rgba: get_color_from_hex("#E5E5EA")
+                Line:
+                    points: [self.x, self.y + self.height, self.x + self.width, self.y + self.height]
+                    width: 1
+
+            BottomNavItem:
+                icon: "🏠"
+                text: "Home"
+                is_active: True
+            BottomNavItem:
+                icon: "📅"
+                text: "Schedule"
+            BottomNavItem:
+                icon: "💬"
+                text: "Chat"
+            BottomNavItem:
+                icon: "👤"
+                text: "Profile"
+
+        # Dashboard Content
+        DashboardContent:
+            id: content_root
+            orientation: 'vertical'
+            size_hint_y: None
+            height: self.minimum_height
+            padding: [dp(20), dp(40), dp(20), dp(20)]
+            spacing: dp(20)
+
+            # HEADER
+            BoxLayout:
+                size_hint_y: None
+                height: dp(50)
+                spacing: dp(10)
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    Label:
+                        text: "Good Morning,"
+                        font_size: '14sp'
+                        color: get_color_from_hex("#8E8E93")
+                        halign: 'left'
+                        text_size: self.size
+                    Label:
+                        text: "Sarah Jenkins"
+                        font_size: '24sp'
+                        bold: True
+                        halign: 'left'
+                        text_size: self.size
+
+                CircularAvatar:
+                    source: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80'
+                    size_hint: None, None
+                    size: dp(50), dp(50)
+
+            # BANNER IMAGE
+            IOSCard:
+                size_hint_y: None
+                height: dp(140)
+                padding: 0
+                clip_to_layout: True
+
+                AsyncImage:
+                    source: 'https://img.freepik.com/free-vector/flat-design-medical-center-landing-page_23-2148954368.jpg'
+                    allow_stretch: True
+                    keep_ratio: False
+                    radius: [dp(18)]
+
+            # QUICK ACTIONS GRID
+            GridLayout:
+                cols: 4
+                size_hint_y: None
+                height: dp(90)
+                spacing: dp(10)
+
+                ActionButton:
+                    text: "Doctor"
+                    icon: "👨‍⚕️"
+                    bg_color: get_color_from_hex("#E3F2FD")
+                    icon_color: get_color_from_hex("#007AFF")
+
+                ActionButton:
+                    text: "Pharmacy"
+                    icon: "💊"
+                    bg_color: get_color_from_hex("#FFF3E0")
+                    icon_color: get_color_from_hex("#FF9500")
+
+                ActionButton:
+                    text: "Hospital"
+                    icon: "🏥"
+                    bg_color: get_color_from_hex("#FFEBEE")
+                    icon_color: get_color_from_hex("#FF3B30")
+
+                ActionButton:
+                    text: "Ambulance"
+                    icon: "🚑"
+                    bg_color: get_color_from_hex("#E8F5E9")
+                    icon_color: get_color_from_hex("#34C759")
+
+            # HEART RATE CARD (GRAPH)
             Label:
-                text: "12"
+                text: "Health Vitals"
                 font_size: '18sp'
                 bold: True
-                pos_hint: {'center_x': 0.5}
-            Label:
-                text: "Jan"
-                font_size: '12sp'
-                color: get_color_from_hex("#8E8E93")
-                pos_hint: {'center_x': 0.5}
+                size_hint_y: None
+                height: dp(30)
+                halign: 'left'
+                text_size: self.size
 
-        # Info
-        BoxLayout:
-            orientation: 'vertical'
+            IOSCard:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: dp(220)
+                padding: dp(15)
+                spacing: dp(10)
+
+                BoxLayout:
+                    size_hint_y: None
+                    height: dp(30)
+                    Label:
+                        text: "Heart Rate"
+                        font_size: '16sp'
+                        bold: True
+                        halign: 'left'
+                        text_size: self.size
+                    Label:
+                        text: "72 BPM"
+                        font_size: '16sp'
+                        bold: True
+                        color: get_color_from_hex("#FF2D55")
+                        halign: 'right'
+                        text_size: self.size
+                
+                # Graph Container (Filled by Python)
+                BoxLayout:
+                    id: graph_container
+                    size_hint: 1, 0.4
+
+            # UPCOMING APPOINTMENT
             Label:
-                text: "Dr. Emily Watson"
-                font_size: '16sp'
+                text: "Upcoming Schedule"
+                font_size: '18sp'
                 bold: True
+                size_hint_y: None
+                height: dp(30)
                 halign: 'left'
                 text_size: self.size
-                valign: 'bottom'
-            Label:
-                text: "Cardiologist • 10:00 AM"
-                font_size: '12sp'
-                color: get_color_from_hex("#8E8E93")
-                halign: 'left'
-                text_size: self.size
-                valign: 'top'
-        
-        # Arrow
-        Label:
-            text: "›"
-            font_size: '24sp'
-            color: get_color_from_hex("#C7C7CC")
-            size_hint_x: None
-            width: dp(20)
+
+            IOSCard:
+                size_hint_y: None
+                height: dp(80)
+                padding: dp(15)
+                spacing: dp(15)
+                
+                # Date Box
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_x: None
+                    width: dp(50)
+                    canvas.before:
+                        Color:
+                            rgba: get_color_from_hex("#F2F2F7")
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [dp(12)]
+                    Label:
+                        text: "12"
+                        font_size: '18sp'
+                        bold: True
+                        pos_hint: {'center_x': 0.5}
+                    Label:
+                        text: "Jan"
+                        font_size: '12sp'
+                        color: get_color_from_hex("#8E8E93")
+                        pos_hint: {'center_x': 0.5}
+
+                # Info
+                BoxLayout:
+                    orientation: 'vertical'
+                    Label:
+                        text: "Dr. Emily Watson"
+                        font_size: '16sp'
+                        bold: True
+                        halign: 'left'
+                        text_size: self.size
+                        valign: 'bottom'
+                    Label:
+                        text: "Cardiologist • 10:00 AM"
+                        font_size: '12sp'
+                        color: get_color_from_hex("#8E8E93")
+                        halign: 'left'
+                        text_size: self.size
+                        valign: 'top'
+                
+                # Arrow
+                Label:
+                    text: "›"
+                    font_size: '24sp'
+                    color: get_color_from_hex("#C7C7CC")
+                    size_hint_x: None
+                    width: dp(20)

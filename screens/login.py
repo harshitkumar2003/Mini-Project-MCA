@@ -64,41 +64,41 @@ class LoginSignupScreen(Screen):
             except Exception:
                 pass
 
-def validate_login(self):
-    adhar = self.ids.adhar_input.text.strip().replace("-", "").replace(" ", "")
-    password = self.ids.password_input.text.strip()
-    role = self.ids.role_spinner.text.strip()
+    def validate_login(self):
+        adhar = self.ids.adhar_input.text.strip().replace("-", "").replace(" ", "")
+        password = self.ids.password_input.text.strip()
+        role = self.ids.role_spinner.text.strip()
 
-    if not adhar or not password or role not in ['User', 'Admin', 'Doctor', 'Patient']:
-        self.show_popup("Error", "Please fill all details and select a valid role.")
-        return
+        if not adhar or not password or role not in ['User', 'Admin', 'Doctor', 'Patient']:
+           self.show_popup("Error", "Please fill all details and select a valid role.")
+           return
 
-    conn = sqlite3.connect("users.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT password, role FROM users WHERE aadhaar=?", (adhar,))
-    result = cursor.fetchone()
+        conn = sqlite3.connect("users.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT password, role FROM users WHERE aadhaar=?", (adhar,))
+        result = cursor.fetchone()
 
-    if result is None:
-        self.show_popup("Error", "User not found.")
-    else:
-        stored_password, stored_role = result
-        if stored_password == password:
-            # Role based screen redirection with typical permissions
-            stored_role_lower = stored_role.lower()
-            if stored_role_lower == 'patient':
-                self.manager.current = 'patient'  # Patient dashboard
-            elif stored_role_lower == 'doctor':
-                self.manager.current = 'doctor'  # Doctor dashboard
-            elif stored_role_lower == 'admin':
-                self.manager.current = 'admin'   # Admin dashboard
-            elif stored_role_lower == 'user':
-                self.manager.current = 'dashboard'  # General user/customer dashboard
-            else:
-                self.show_popup("Error", "Invalid role assigned to user.")
+        if result is None:
+            self.show_popup("Error", "User not found.")
         else:
-            self.show_popup("Error", "Incorrect password.")
+            stored_password, stored_role = result
+            if stored_password == password:
+            # Role based screen redirection with typical permissions
+                stored_role_lower = stored_role.lower()
+                if stored_role_lower == 'patient':
+                    self.manager.current = 'patient'  # Patient dashboard
+                elif stored_role_lower == 'doctor':
+                    self.manager.current = 'doctor'  # Doctor dashboard
+                elif stored_role_lower == 'admin':
+                    self.manager.current = 'admin'   # Admin dashboard
+                elif stored_role_lower == 'user':
+                    self.manager.current = 'dashboard'  # General user/customer dashboard
+                else:
+                    self.show_popup("Error", "Invalid role assigned to user.")
+            else:
+                self.show_popup("Error", "Incorrect password.")
 
-    conn.close()
+        conn.close()
 
 
     def validate_signup(self):
