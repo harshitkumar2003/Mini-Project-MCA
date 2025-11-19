@@ -6,7 +6,7 @@ from kivy.uix.label import Label
 from kivy.properties import StringProperty
 from kivy.uix.textinput import TextInput
 
-
+#!adhar input ki functionality for formatting with dashes 
 class AadhaarInput(TextInput):
     def insert_text(self, substring, from_undo=False):
         # Only digits allowed, combine existing and new input
@@ -24,7 +24,7 @@ class AadhaarInput(TextInput):
         self.text = s
         self.cursor = (len(self.text), 0)
 
-
+#! login and signup screen with OTP and password reset
 class LoginSignupScreen(Screen):
     temp_otp = StringProperty('')
     current_reset_adhar = ''  # Track Aadhaar for resetting password
@@ -49,7 +49,8 @@ class LoginSignupScreen(Screen):
         """)
         conn.commit()
         conn.close()
-
+   
+    #! otp ko auto move krne k liye next box me focus hojaye
     def on_otp_text(self, instance, value):
         if len(value) > 1:
             instance.text = value[:1]
@@ -64,6 +65,7 @@ class LoginSignupScreen(Screen):
             except Exception:
                 pass
 
+    #! validate  krega login credentials and redirect based on role
     def validate_login(self):
         adhar = self.ids.adhar_input.text.strip().replace("-", "").replace(" ", "")
         password = self.ids.password_input.text.strip()
@@ -83,7 +85,7 @@ class LoginSignupScreen(Screen):
         else:
             stored_password, stored_role = result
             if stored_password == password:
-            # Role based screen redirection with typical permissions
+            #! Role based screen redirection with typical permissions
                 stored_role_lower = stored_role.lower()
                 if stored_role_lower == 'patient':
                     self.manager.current = 'patient'  # Patient dashboard
@@ -100,7 +102,7 @@ class LoginSignupScreen(Screen):
 
         conn.close()
 
-
+    #! validate krega signup details and store in database
     def validate_signup(self):
         name = self.ids.name_input.text.strip()
         email = self.ids.email_input.text.strip()
@@ -129,13 +131,14 @@ class LoginSignupScreen(Screen):
         except Exception as e:
             self.show_popup("Error", f"Signup failed: {e}")
 
+    #! OTP generation and verification for password reset krna
     def send_otp(self):
         adhar = self.ids.forgot_adhar_input.text.strip().replace("-", "").replace(" ", "")
         if not adhar:
             self.show_popup("Error", "Please enter Aadhaar number.")
             return
 
-        # Check if Aadhaar exists in database before sending OTP
+        #! Check if Aadhaar exists in database before sending OTP
         conn = sqlite3.connect("users.db")
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE aadhaar=?", (adhar,))
@@ -150,6 +153,7 @@ class LoginSignupScreen(Screen):
         self.ids.otp_notice.text = f"(Test OTP: {self.temp_otp})"
         self.show_popup("OTP Generated", "Check OTP displayed below and enter to verify.")
 
+    #! OTP verification
     def verify_otp(self):
         entered_otp = ''.join([self.ids[f'otp{i}'].text for i in range(1, 5)])
         if entered_otp == self.temp_otp:
@@ -159,6 +163,7 @@ class LoginSignupScreen(Screen):
         else:
             self.show_popup("Error", "Incorrect OTP.")
 
+#! password reset functionality
     def reset_password(self):
         new_password = self.ids.new_password_input.text.strip()
         confirm_password = self.ids.confirm_password_input.text.strip()
@@ -179,12 +184,13 @@ class LoginSignupScreen(Screen):
             conn.close()
             self.show_popup("Success", "Password reset successfully. Please login.")
             self.screen_switch("login_view")
-            # Clear password fields after reset
+            #! Clear password fields after reset
             self.ids.new_password_input.text = ""
             self.ids.confirm_password_input.text = ""
         except Exception as e:
             self.show_popup("Error", f"Failed to reset password: {e}")
 
+#! screen switching between login, signup, otp, reset views
     def screen_switch(self, target):
         self.ids.login_views.current = target
         # Optionally clear inputs when switching screens here
