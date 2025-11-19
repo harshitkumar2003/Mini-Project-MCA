@@ -75,7 +75,7 @@ class LoginSignupScreen(Screen):
 
         conn = sqlite3.connect("users.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT password, role FROM users WHERE aadhaar=?", (adhar,))
+        cursor.execute("SELECT password, role FROM users WHERE aadhaar=?", (adhar, password, role))
         result = cursor.fetchone()
 
         if result is None:
