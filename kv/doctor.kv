@@ -1,0 +1,281 @@
+# Kivy 2.1.0
+
+# --- 1. Custom Widget Definitions ---
+# The style properties for RoundedBoxLayout are defined in Python, 
+# so we just define the base widget structure here.
+
+<AppointmentItem@BoxLayout>:
+    # Base style for an appointment row
+    size_hint_y: None
+    height: root.dp(50)
+    spacing: root.dp(10)
+
+    # Icon
+    Label:
+        text: "👤"
+        font_size: '24sp'
+        size_hint_x: None
+        width: root.dp(30)
+        color: root.get_color_from_hex("#555555")
+
+    # Name and Date
+    Label:
+        id: name_date
+        text: "Camily\n[size=12sp][color=888888]OUVY 2021[/color][/size]"
+        markup: True
+        halign: 'left'
+        valign: 'middle'
+        text_size: (root.dp(120), None)
+        color: root.get_color_from_hex("#333333")
+
+    # Time
+    Label:
+        text: "1:00 pm"
+        font_size: '14sp'
+        color: root.get_color_from_hex("#555555")
+        size_hint_x: 0.3
+
+# --- 2. Main Layout Structure ---
+
+<ModernDoctorDashboard@BoxLayout>:
+    # This matches the root_layout in your Python build method
+    padding: root.dp(20)
+    
+    # 2. Main Content Panel
+    RoundedBoxLayout:
+        id: main_panel
+        orientation: 'vertical'
+        padding: root.dp(25)
+        spacing: root.dp(20)
+        background_color: root.get_color_from_hex("#F7F7F9")
+        radius: [root.dp(20)]
+        
+        # 3. Header
+        BoxLayout:
+            size_hint_y: None
+            height: root.dp(50)
+            spacing: root.dp(20)
+            
+            # Search Bar (Left)
+            RoundedBoxLayout:
+                size_hint_x: 0.7
+                padding: [root.dp(10), 0]
+                radius: [root.dp(10)]
+
+                Label:
+                    text: "🔍"
+                    font_size: '20sp'
+                    size_hint_x: None
+                    width: root.dp(40)
+                    color: root.get_color_from_hex("#888888")
+
+                TextInput:
+                    hint_text: "Search Patient"
+                    background_color: [0,0,0,0]
+                    foreground_color: root.get_color_from_hex("#333333")
+                    border: (0,0,0,0)
+                    font_size: '16sp'
+                    padding: [0, root.dp(15), 0, 0]
+
+            # Doctor Info (Right)
+            BoxLayout:
+                size_hint_x: 0.3
+                spacing: root.dp(15)
+                padding: [root.dp(10), 0]
+
+                Label:
+                    text: "👤"
+                    font_size: '35sp'
+                    size_hint_x: None
+                    width: root.dp(40)
+                    color: root.get_color_from_hex("#333333")
+
+                Label:
+                    text: "Doctor Name\n[size=12sp][color=888888]Cardiologist[/color][/size]"
+                    markup: True
+                    halign: 'left'
+                    valign: 'middle'
+                    color: root.get_color_from_hex("#333333")
+                    size_hint_x: 0.7
+                    
+        # 4. Main Content (3-column layout)
+        BoxLayout:
+            spacing: root.dp(20)
+            
+            # --- Column 1: Appointments ---
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.3
+                spacing: root.dp(10)
+                
+                Label:
+                    text: "Upcoming Appointments"
+                    font_size: '20sp'
+                    bold: True
+                    color: root.get_color_from_hex("#333333")
+                    size_hint_y: None
+                    height: root.dp(30)
+                    halign: 'left'
+                    text_size: (root.dp(250), None)
+                    
+                RoundedBoxLayout: # list_card
+                    padding: root.dp(10)
+                    
+                    ScrollView:
+                        do_scroll_x: False
+                        GridLayout:
+                            cols: 1
+                            size_hint_y: None
+                            spacing: root.dp(10)
+                            height: self.minimum_height # Critical for scroll
+                            
+                            # Add AppointmentItem widgets here (repeatedly in Python or statically)
+                            AppointmentItem:
+                            AppointmentItem:
+                            AppointmentItem:
+                            AppointmentItem:
+                            AppointmentItem:
+                            AppointmentItem:
+                            AppointmentItem:
+
+            # --- Column 2: Vitals ---
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.4
+                spacing: root.dp(20)
+                
+                # Heart Rate Card (Placeholder for Python-generated graph)
+                RoundedBoxLayout:
+                    orientation: 'vertical'
+                    padding: root.dp(10)
+                    spacing: root.dp(5)
+                    
+                    Label:
+                        text: "Heart Rate"
+                        font_size: '18sp'
+                        bold: True
+                        color: root.get_color_from_hex("#333333")
+                        size_hint_y: None
+                        height: root.dp(30)
+                        halign: 'left'
+                        text_size: (root.dp(300), None)
+                    
+                    # Graph widget added by Python's create_line_graph()
+                    Widget: 
+                        size_hint_y: 1 # Takes remaining space
+                        # Python will replace this with the Graph object
+                    
+                # Blood Pressure Card (Placeholder for Python-generated graph)
+                RoundedBoxLayout:
+                    orientation: 'vertical'
+                    padding: root.dp(10)
+                    spacing: root.dp(5)
+                    
+                    Label:
+                        text: "Blood Pressure"
+                        font_size: '18sp'
+                        bold: True
+                        color: root.get_color_from_hex("#333333")
+                        size_hint_y: None
+                        height: root.dp(30)
+                        halign: 'left'
+                        text_size: (root.dp(300), None)
+                        
+                    # Graph widget added by Python's create_bar_graph()
+                    Widget: 
+                        size_hint_y: 1 # Takes remaining space
+                        # Python will replace this with the Graph object
+
+
+            # --- Column 3: Results & Alerts ---
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.3
+                spacing: root.dp(20)
+                
+                # Lab Results Card
+                RoundedBoxLayout:
+                    orientation: 'vertical'
+                    padding: root.dp(15)
+                    spacing: root.dp(10)
+                    size_hint_y: 0.6 # Arbitrary size to separate from alerts
+                    
+                    Label:
+                        text: "Recent Lab Results"
+                        font_size: '18sp'
+                        bold: True
+                        color: root.get_color_from_hex("#333333")
+                        size_hint_y: None
+                        height: root.dp(30)
+                        halign: 'left'
+                        text_size: (root.dp(250), None)
+                        
+                    # Mock Results (Static for KV file)
+                    Label:
+                        text: "• Coat Hb results"
+                        color: root.get_color_from_hex("#555555")
+                        font_size: '15sp'
+                        halign: 'left'
+                        text_size: (root.dp(240), None)
+                        size_hint_y: None
+                        height: root.dp(25)
+                    Label:
+                        text: "• Hest 1gb results"
+                        color: root.get_color_from_hex("#555555")
+                        font_size: '15sp'
+                        halign: 'left'
+                        text_size: (root.dp(240), None)
+                        size_hint_y: None
+                        height: root.dp(25)
+                    Label:
+                        text: "• Cirod pred results"
+                        color: root.get_color_from_hex("#555555")
+                        font_size: '15sp'
+                        halign: 'left'
+                        text_size: (root.dp(240), None)
+                        size_hint_y: None
+                        height: root.dp(25)
+                    Label:
+                        text: "• Pest o results"
+                        color: root.get_color_from_hex("#555555")
+                        font_size: '15sp'
+                        halign: 'left'
+                        text_size: (root.dp(240), None)
+                        size_hint_y: None
+                        height: root.dp(25)
+                        
+                # Urgent Alerts Card
+                RoundedBoxLayout:
+                    orientation: 'vertical'
+                    padding: root.dp(15)
+                    spacing: root.dp(10)
+                    size_hint_y: 0.4 # Arbitrary size to separate from results
+                    
+                    Label:
+                        text: "Urgent Alerts"
+                        font_size: '18sp'
+                        bold: True
+                        color: root.get_color_from_hex("#333333")
+                        size_hint_y: None
+                        height: root.dp(30)
+                        halign: 'left'
+                        text_size: (root.dp(250), None)
+                        
+                    BoxLayout: # alert_box
+                        spacing: root.dp(10)
+                        padding: [0, root.dp(10)]
+                        
+                        Label:
+                            text: "❗"
+                            font_size: '24sp'
+                            color: root.get_color_from_hex("#E74C3C")
+                            size_hint_x: None
+                            width: root.dp(30)
+                            
+                        Label:
+                            text: "Alert: Avertit alian ceius consesciat escihnt oerat."
+                            color: root.get_color_from_hex("#555555")
+                            font_size: '14sp'
+                            halign: 'left'
+                            valign: 'top'
+                            text_size: (root.dp(200), None)
