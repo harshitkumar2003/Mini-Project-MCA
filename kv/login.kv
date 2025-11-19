@@ -11,17 +11,15 @@
                 rgba: 1, 1, 1, 1  # If you want a slight overlay, adjust alpha to e.g. 0.92
             # The illustration placed bottom left, covering ~45% width, ~60% height
             Rectangle:
-                source: "assets/login-illustration.png"
+                source: "assets/ill-1.png"
                 pos: self.x, self.y
-                size: self.width * 0.79, self.height * 0.7
+                size: self.width * 0.90, self.height * 1
 
         BoxLayout:
             id: card_box
             orientation: 'vertical'
-            size_hint: None, None
-            width: min(380, root.width * 0.93)
-            height: min(650, root.height * 0.93)
-            pos_hint: {"center_x": 0.63, "center_y": 0.6}
+            size_hint: 0.4, 1.4  # Takes 50% of parent width and 50% of parent height
+            pos_hint: {"center_x": 0.64, "center_y": 0.33}
             padding: [24, 32, 24, 24]  # More top padding for floating effect
             spacing: 16
 
@@ -29,13 +27,13 @@
             Image:
                 source: "assets/logo2.png"
                 size_hint_y: None
-                height: "84dp"
+                height: "94dp"
                 allow_stretch: True
-                pos_hint: {"center_x": 0.5}
+                pos_hint: {"center_x": 0.1}
                 opacity: 1
 
             Widget:
-                size_hint_y: None
+                size_hint_y: 0.3
                 height: 10
 
             ScreenManager:
@@ -47,82 +45,93 @@
                     name: "login_view"
                     ScrollView:
                         do_scroll_x: False
-                        do_scroll_y: True
+                        do_scroll_y: False
                         BoxLayout:
                             orientation: 'vertical'
                             size_hint_y: None
                             height: self.minimum_height
-                            spacing: 12
+                            spacing: 18
                             padding: [0, 0]
 
                             AadhaarInput:
                                 id: adhar_input
                                 hint_text: "Aadhar No."
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_active: ""
                                 background_color: 0.96, 0.96, 0.96, 1
                                 foreground_color: 0, 0, 0, 1
-                                font_size: 16
+                                font_size: 18
                                 multiline: False
-                                padding: [15, (self.height - self.line_height) / 2]
+                                padding: [20, (self.height - self.line_height) / 2]
 
                             TextInput:
                                 id: password_input
                                 hint_text: "Password"
                                 password: True
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_active: ""
                                 background_color: 0.96, 0.96, 0.96, 1
                                 foreground_color: 0, 0, 0, 1
-                                font_size: 16
+                                font_size: 18
                                 multiline: False
-                                padding: [15, (self.height - self.line_height) / 2]
+                                padding: [20, (self.height - self.line_height) / 2]
 
                             Spinner:
                                 id: role_spinner
                                 text: "Select Role"
                                 values: ["User","Admin", "Doctor", "Patient"]
                                 size_hint_y: None
-                                height: 44
+                                height: 48
                                 background_normal: ""
                                 background_color: 0.2, 0.6, 0.4, 1
                                 color: 1, 1, 1, 1
-                                font_size: 16
+                                font_size: 18
 
                             Button:
                                 text: "Log In"
                                 size_hint_y: None
-                                height: 44
+                                height: 48
                                 background_normal: ""
                                 background_color: 0.2, 0.6, 0.4, 1
                                 color: 1, 1, 1, 1
-                                font_size: 16
+                                font_size: 18
                                 bold: True
                                 on_release: root.validate_login()
 
                             BoxLayout:
+                                orientation: 'vertical'
                                 size_hint_y: None
-                                height: 34
-                                spacing: 16
+                                height: self.minimum_height
+                                spacing: 3
 
                                 Button:
                                     text: "Forgot password?"
+                                    size_hint_y: None
+                                    height: dp(20)
+                                    text_size: self.size
+                                    halign: 'left'
+                                    valign: 'middle'
                                     background_normal: ""
                                     background_color: 0, 0, 0, 0
                                     color: 0.18, 0.34, 0.82, 1
-                                    font_size: 14
+                                    font_size: 17
                                     on_release: root.screen_switch("forgot_view")
 
                                 Button:
-                                    text: "Sign Up"
+                                    text: "Don't have an account Sign Up"
+                                    size_hint_y: None
+                                    height: dp(20)
+                                    text_size: self.size
+                                    halign: 'left'
+                                    valign: 'middle'
                                     background_normal: ""
                                     background_color: 0, 0, 0, 0
                                     color: 0.18, 0.34, 0.82, 1
-                                    font_size: 14
+                                    font_size: 17
                                     on_release: root.screen_switch("signup_view")
 
                 # ----- Signup View -----
@@ -130,110 +139,110 @@
                     name: "signup_view"
                     ScrollView:
                         do_scroll_x: False
-                        do_scroll_y: True
+                        do_scroll_y: False
                         BoxLayout:
                             orientation: 'vertical'
                             size_hint_y: None
                             height: self.minimum_height
-                            spacing: 12
+                            spacing: 15
                             padding: [0, 0]
 
                             TextInput:
                                 id: name_input
                                 hint_text: "Name"
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_active: ""
                                 background_color: 0.96, 0.96, 0.96, 1
                                 foreground_color: 0, 0, 0, 1
-                                font_size: 16
+                                font_size: 18
                                 multiline: False
-                                padding: [15, (self.height - self.line_height) / 2]
+                                padding: [20, (self.height - self.line_height) / 2]
 
                             TextInput:
                                 id: email_input
                                 hint_text: "Email"
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_active: ""
                                 background_color: 0.96, 0.96, 0.96, 1
                                 foreground_color: 0, 0, 0, 1
-                                font_size: 16
+                                font_size: 18
                                 multiline: False
-                                padding: [15, (self.height - self.line_height) / 2]
+                                padding: [20, (self.height - self.line_height) / 2]
 
                             AadhaarInput:
                                 id: signup_adhar_input
                                 hint_text: "Aadhar No."
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_active: ""
                                 background_color: 0.96, 0.96, 0.96, 1
                                 foreground_color: 0, 0, 0, 1
-                                font_size: 16
+                                font_size: 18
                                 multiline: False
-                                padding: [15, (self.height - self.line_height) / 2]
+                                padding: [20, (self.height - self.line_height) / 2]
 
                             TextInput:
                                 id: phone_input
                                 hint_text: "Phone number"
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_active: ""
                                 background_color: 0.96, 0.96, 0.96, 1
                                 foreground_color: 0, 0, 0, 1
-                                font_size: 16
+                                font_size: 18
                                 multiline: False
-                                padding: [15, (self.height - self.line_height) / 2]
+                                padding: [20, (self.height - self.line_height) / 2]
 
                             TextInput:
                                 id: signup_password_input
                                 hint_text: "Password"
                                 password: True
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_active: ""
                                 background_color: 0.96, 0.96, 0.96, 1
                                 foreground_color: 0, 0, 0, 1
-                                font_size: 16
+                                font_size: 18
                                 multiline: False
-                                padding: [15, (self.height - self.line_height) / 2]
+                                padding: [20, (self.height - self.line_height) / 2]
 
                             Spinner:
                                 id: signup_role_spinner
                                 text: "Signin as"
-                                values: ["User","Patient", "Doctor"]
+                                values: ["User"]
                                 size_hint_y: None
-                                height: 44
+                                height: 48
                                 background_normal: ""
                                 background_color: 0.2, 0.6, 0.4, 1
                                 color: 1, 1, 1, 1
-                                font_size: 16
+                                font_size: 18
 
                             Button:
                                 text: "Sign Up"
                                 size_hint_y: None
-                                height: 44
+                                height: 48
                                 background_normal: ""
                                 background_color: 0.2, 0.6, 0.4, 1
                                 color: 1, 1, 1, 1
-                                font_size: 16
+                                font_size: 18
                                 bold: True
                                 on_release: root.validate_signup()
 
                             Button:
                                 text: "← Back"
                                 size_hint_y: None
-                                height: 32
+                                height: 40
                                 background_normal: ""
                                 background_color: 0, 0, 0, 0
                                 color: 0.18, 0.34, 0.82, 1
-                                font_size: 14
+                                font_size: 18
                                 on_release: root.screen_switch("login_view")
 
                 # ----- Forgot Password View -----
@@ -241,35 +250,35 @@
                     name: "forgot_view"
                     ScrollView:
                         do_scroll_x: False
-                        do_scroll_y: True
+                        do_scroll_y: False
                         BoxLayout:
                             orientation: "vertical"
                             size_hint_y: None
                             height: self.minimum_height
-                            spacing: 12
+                            spacing: 15
                             padding: [0, 0]
 
                             AadhaarInput:
                                 id: forgot_adhar_input
                                 hint_text: "Enter Aadhar"
                                 size_hint_y: None
-                                height: 34
+                                height: 50
                                 background_normal: ""
                                 background_active: ""
                                 background_color: 0.96, 0.96, 0.96, 1
                                 foreground_color: 0, 0, 0, 1
-                                font_size: 16
+                                font_size: 18
                                 multiline: False
-                                padding: [15, (self.height - self.line_height) / 2]
+                                padding: [18, (self.height - self.line_height) / 2]
 
                             Button:
                                 text: "Get OTP"
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_color: 0.2, 0.6, 0.4, 1
                                 color: 1, 1, 1, 1
-                                font_size: 16
+                                font_size: 18
                                 bold: True
                                 on_release: root.send_otp()
 
@@ -277,14 +286,15 @@
                                 id: otp_notice
                                 size_hint_y: None
                                 height: 20
+                                bold: True
                                 color: 0.6, 0.2, 0.05, 1
-                                font_size: 14
+                                font_size: 17
 
                             BoxLayout:
                                 orientation: "horizontal"
-                                spacing: 8
+                                spacing: 25
                                 size_hint_y: None
-                                height: 44
+                                height: 50
 
                                 TextInput:
                                     id: otp1
@@ -292,7 +302,7 @@
                                     multiline: False
                                     halign: "center"
                                     font_size: 18
-                                    size_hint_x: 0.22
+                                    size_hint_x: 0.15
                                     background_normal: ""
                                     background_active: ""
                                     background_color: 0.96, 0.96, 0.96, 1
@@ -305,7 +315,7 @@
                                     multiline: False
                                     halign: "center"
                                     font_size: 18
-                                    size_hint_x: 0.22
+                                    size_hint_x: 0.15
                                     background_normal: ""
                                     background_active: ""
                                     background_color: 0.96, 0.96, 0.96, 1
@@ -318,7 +328,7 @@
                                     multiline: False
                                     halign: "center"
                                     font_size: 18
-                                    size_hint_x: 0.22
+                                    size_hint_x: 0.15
                                     background_normal: ""
                                     background_active: ""
                                     background_color: 0.96, 0.96, 0.96, 1
@@ -331,7 +341,7 @@
                                     multiline: False
                                     halign: "center"
                                     font_size: 18
-                                    size_hint_x: 0.22
+                                    size_hint_x: 0.15
                                     background_normal: ""
                                     background_active: ""
                                     background_color: 0.96, 0.96, 0.96, 1
@@ -341,22 +351,22 @@
                             Button:
                                 text: "Confirm"
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_color: 0.12, 0.29, 0.61, 1
                                 color: 1, 1, 1, 1
-                                font_size: 16
+                                font_size: 18
                                 bold: True
                                 on_release: root.verify_otp()
 
                             Button:
                                 text: "← Back"
                                 size_hint_y: None
-                                height: 32
+                                height: 40
                                 background_normal: ""
                                 background_color: 0, 0, 0, 0
                                 color: 0.18, 0.34, 0.82, 1
-                                font_size: 14
+                                font_size: 17
                                 on_release: root.screen_switch("login_view")
 
                 # ----- Reset Password View -----
@@ -364,19 +374,19 @@
                     name: "reset_password_view"
                     ScrollView:
                         do_scroll_x: False
-                        do_scroll_y: True
+                        do_scroll_y: False
                         BoxLayout:
                             orientation: "vertical"
                             size_hint_y: None
                             height: self.minimum_height
-                            spacing: 12
+                            spacing: 15
                             padding: [24, 24]
 
                             Label:
                                 text: "Reset Password"
                                 font_size: 22
                                 size_hint_y: None
-                                height: 40
+                                height: 50
                                 bold: True
 
                             TextInput:
@@ -384,12 +394,12 @@
                                 hint_text: "New Password"
                                 password: True
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_active: ""
                                 background_color: 0.96, 0.96, 0.96, 1
                                 foreground_color: 0, 0, 0, 1
-                                font_size: 16
+                                font_size: 18
                                 padding: [15, (self.height - self.line_height) / 2]
 
                             TextInput:
@@ -397,31 +407,31 @@
                                 hint_text: "Confirm Password"
                                 password: True
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_active: ""
                                 background_color: 0.96, 0.96, 0.96, 1
                                 foreground_color: 0, 0, 0, 1
-                                font_size: 16
+                                font_size: 18
                                 padding: [15, (self.height - self.line_height) / 2]
 
                             Button:
                                 text: "Reset Password"
                                 size_hint_y: None
-                                height: 44
+                                height: 50
                                 background_normal: ""
                                 background_color: 0.2, 0.6, 0.4, 1
                                 color: 1, 1, 1, 1
-                                font_size: 16
+                                font_size: 18
                                 bold: True
                                 on_release: root.reset_password()
 
                             Button:
                                 text: "← Back to Login"
                                 size_hint_y: None
-                                height: 32
+                                height: 40
                                 background_normal: ""
                                 background_color: 0, 0, 0, 0
                                 color: 0.18, 0.34, 0.82, 1
-                                font_size: 14
+                                font_size: 17
                                 on_release: root.screen_switch("login_view")

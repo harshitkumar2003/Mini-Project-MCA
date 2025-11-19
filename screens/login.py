@@ -56,7 +56,7 @@ class LoginSignupScreen(Screen):
 
         if len(instance.text) == 1:
             try:
-                current_id = instance.id  # eg otp1
+                current_id = instance.id  # e.g., otp1
                 next_index = int(current_id[-1]) + 1
                 next_id = f'otp{next_index}'
                 if next_id in self.ids:
@@ -64,14 +64,13 @@ class LoginSignupScreen(Screen):
             except Exception:
                 pass
 
-    # Login
     def validate_login(self):
         # Remove dashes and spaces from Aadhaar number before validation
         adhar = self.ids.adhar_input.text.strip().replace("-", "").replace(" ", "")
         password = self.ids.password_input.text.strip()
         role = self.ids.role_spinner.text.strip()
 
-        if not adhar or not password or role not in ['User','Admin', 'Doctor', 'Patient']:
+        if not adhar or not password or role not in ['User', 'Admin', 'Doctor', 'Patient']:
             self.show_popup("Error", "Please fill all details and select a valid role.")
             return
 
@@ -80,13 +79,17 @@ class LoginSignupScreen(Screen):
         cursor.execute("SELECT * FROM users WHERE aadhaar=? AND password=? AND role=?", (adhar, password, role))
         result = cursor.fetchone()
         conn.close()
+
         if result:
             self.show_popup("Success", f"Welcome back, {role}!")
-            # Add navigation based on role here, if needed
+            # Navigate based on role
+            if role == 'User':
+                self.manager.current = 'dashboard'
+            else:
+                self.show_popup("Info", f"Navigation for role '{role}' is not implemented yet.")
         else:
             self.show_popup("Error", "Invalid credentials.")
 
-    # Signup
     def validate_signup(self):
         name = self.ids.name_input.text.strip()
         email = self.ids.email_input.text.strip()
@@ -95,7 +98,7 @@ class LoginSignupScreen(Screen):
         password = self.ids.signup_password_input.text.strip()
         role = self.ids.signup_role_spinner.text.strip()
 
-        if not (name and email and adhar and phone and password and role in ["Doctor", "Patient"]):
+        if not (name and email and adhar and phone and password and role in ["User"]):
             self.show_popup("Error", "All fields are required, and a valid role must be selected.")
             return
 
@@ -115,7 +118,6 @@ class LoginSignupScreen(Screen):
         except Exception as e:
             self.show_popup("Error", f"Signup failed: {e}")
 
-    # Send OTP for forgot password with Aadhaar existence check
     def send_otp(self):
         adhar = self.ids.forgot_adhar_input.text.strip().replace("-", "").replace(" ", "")
         if not adhar:
@@ -137,7 +139,6 @@ class LoginSignupScreen(Screen):
         self.ids.otp_notice.text = f"(Test OTP: {self.temp_otp})"
         self.show_popup("OTP Generated", "Check OTP displayed below and enter to verify.")
 
-    # Verify OTP and go to reset password
     def verify_otp(self):
         entered_otp = ''.join([self.ids[f'otp{i}'].text for i in range(1, 5)])
         if entered_otp == self.temp_otp:
@@ -147,7 +148,6 @@ class LoginSignupScreen(Screen):
         else:
             self.show_popup("Error", "Incorrect OTP.")
 
-    # Reset password logic
     def reset_password(self):
         new_password = self.ids.new_password_input.text.strip()
         confirm_password = self.ids.confirm_password_input.text.strip()
@@ -174,12 +174,17 @@ class LoginSignupScreen(Screen):
         except Exception as e:
             self.show_popup("Error", f"Failed to reset password: {e}")
 
-    # Screen switch helper
     def screen_switch(self, target):
         self.ids.login_views.current = target
         # Optionally clear inputs when switching screens here
 
-    # Popup helper
     def show_popup(self, title, message):
         Popup(title=title, content=Label(text=message),
               size_hint=(0.6, 0.4)).open()
+    
+    def reset_fields(self):
+        self.ids.adhar_input.text = ""
+        self.ids.password_input.text = ""
+        self.ids.role_spinner.text = "Select Role"  # or default value
+        # Reset other fields if required
+    

@@ -1,0 +1,150 @@
+<HomeDashboardScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+
+        BoxLayout:
+            size_hint_y: None
+            height: 60
+            padding: 10
+            spacing: 10
+            canvas.before:
+                Color:
+                    rgba: 0.2, 0.6, 0.4, 1  # Green top bar
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Image:
+                source: "assets/logo2.png"
+                size_hint_x: None
+                width: 150
+                allow_stretch: True
+                keep_ratio: True
+
+            Widget:
+
+            Button:
+                text: "Logout"
+                size_hint_x: None
+                width: 100
+                background_normal: ""
+                background_color: 0.9, 0.1, 0.1, 1
+                on_release:
+                    app.root.get_screen('login').reset_fields()
+                    app.root.current = 'login'
+
+        ScrollView:
+            do_scroll_x: True
+
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                padding: 16
+                spacing: 16
+
+                BoxLayout:
+                    spacing: 20
+                    size_hint_y: None
+                    height: 170  # increased height for bigger cards
+
+                    InfoCard:
+                        id: appointments_card
+                        title: "Appointments"
+                        value: "0"
+                        icon_source: "assets/calendar.jpg"
+                        size_hint: None, None
+                        width: self.parent.width / 4 - 20
+                        height: 170
+
+                    InfoCard:
+                        id: reports_card
+                        title: "Reports"
+                        value: "0"
+                        icon_source: "assets/report.png"
+                        size_hint: None, None
+                        width: self.parent.width / 4 - 20
+                        height: 170
+
+                    InfoCard:
+                        id: doctors_card
+                        title: "Doctors"
+                        value: "0"
+                        icon_source: "assets/doctor.png"
+                        size_hint: None, None
+                        width: self.parent.width / 4 - 20
+                        height: 170
+
+                    InfoCard:
+                        id: new_disease_card
+                        title: "New Disease"
+                        value: "0"
+                        icon_source: "assets/disease.png"
+                        size_hint: None, None
+                        width: self.parent.width / 4 - 20
+                        height: 170
+
+                BoxLayout:
+                    size_hint_y: None
+                    height: 300
+                    canvas.before:
+                        Color:
+                            rgba: 1, 1, 1, 1
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+                    Graph:
+                        id: health_graph
+                        xlabel: "Time"
+                        ylabel: "Value"
+                        x_ticks_minor: 4
+                        x_ticks_major: 10
+                        y_ticks_major: 10
+                        y_ticks_minor: 5
+                        y_grid_label: True
+                        x_grid_label: True
+                        padding: 5
+                        x_grid: True
+                        y_grid: True
+                        xmin: 0
+                        xmax: 40
+                        ymin: 0
+                        ymax: 100
+
+<InfoCard@BoxLayout>:
+    value: ''         # property declarations to avoid attribute errors
+    title: ''
+    icon_source: ''
+    orientation: 'vertical'
+    padding: 12
+    size_hint: None, None
+    height: 120
+    width: 120
+    canvas.before:
+        Color:
+            rgba: 0.85, 0.95, 0.85, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [10,]
+
+    Image:
+        source: root.icon_source
+        size_hint_y: None
+        height: 48
+        allow_stretch: True
+
+    Label:
+        text: root.title
+        font_size: 16
+        color: 0, 0.5, 0
+        bold: True
+        size_hint_y: None
+        height: 24
+
+    Label:
+        text: str(root.value)
+        font_size: 28
+        color: 0, 0.6, 0
+        bold: True

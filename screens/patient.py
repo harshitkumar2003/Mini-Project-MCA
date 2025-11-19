@@ -36,7 +36,7 @@ kivy.require('2.1.0')
 
 # --- FIX: LOAD KV FILE ROBUSTLY ---
 # This gets the directory where patient.py is located
-current_dir = os.path.dirname(os.path.abspath(__file__))
+current_dir = os.path.dirname(os.path.abspath("screens/patient.py"))
 # This combines the directory with the filename
 kv_file_path = os.path.join(current_dir, 'kv/patient.kv')
 
