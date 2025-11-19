@@ -8,6 +8,7 @@ from kivy.utils import get_color_from_hex
 from kivy.metrics import dp
 from kivy.core.window import Window
 from kivy.lang import Builder
+from kivy.uix.screenmanager import Screen
 
 # --- Import Kivy Garden Graph ---
 try:
@@ -121,13 +122,6 @@ class LabsSection(BoxLayout):
 class DashboardRoot(ScrollView):
     pass
 
-class PatientDashboardApp(App):
-    def build(self):
-        # Set App Background Color
-        Window.clearcolor = get_color_from_hex("#F7F7F9")
-        # Simulate Mobile Size
-       # Window.size = (400, 800)
-        return DashboardRoot()
 
-if __name__ == '__main__':
-    PatientDashboardApp().run()
+class PatientScreen(Screen):
+    pass  # This screen

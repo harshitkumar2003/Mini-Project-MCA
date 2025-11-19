@@ -1,4 +1,5 @@
 import kivy
+from kivy.uix.screenmanager import Screen
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
@@ -76,7 +77,7 @@ class RoundedBoxLayout(BoxLayout):
 # --- MAIN APPLICATION CLASS ---
 # -------------------------------------------------------------------
 
-class ModernDoctorDashboardApp(App):
+class DoctorDashboard(App):
     
     def build(self):
         # Set the main window background color (the border area)
@@ -401,8 +402,5 @@ class ModernDoctorDashboardApp(App):
         graph.add_plot(plot)
         return graph
 
-# ------------------
-# --- RUN THE APP
-# ------------------
-if __name__ == '__main__':
-    ModernDoctorDashboardApp().run()
+class DoctorScreen(Screen):
+    pass  # This screen loads doctor.kv and contains widgets defined before

@@ -11,8 +11,8 @@ from kivy_garden.graph import Graph, LinePlot
 from screens.splash import SplashScreen          #todo: animation code for splash screen
 from screens.login import LoginSignupScreen      #todo: login and signup functionality
 from screens.dashboard import HomeDashboardScreen  #todo: user dashboard after login
-# from screens.patient import PatientScreen
-# from screens.doctor import DoctorScreen
+from screens.patient import PatientScreen
+from screens.doctor import DoctorScreen
 
 #! Output Screen Example: Mobile screen size (iPhone 14 approx)
 #Window.size = (250, 540)  #! Width x Height in pixels
@@ -26,8 +26,8 @@ Factory.register('LinePlot', cls=LinePlot)
 Builder.load_file("kv/splash.kv")
 Builder.load_file("kv/login.kv")
 Builder.load_file("kv/dashboard.kv")
-# Builder.load_file("kv/patient.kv")
-# Builder.load_file("kv/doctor.kv")
+Builder.load_file("kv/patient.kv")
+Builder.load_file("kv/doctor.kv")
 
 #! Global background color (white)
 Window.clearcolor = get_color_from_hex("#ffffff")
@@ -39,8 +39,8 @@ class HealthcareApp(App):
         sm.add_widget(SplashScreen(name="splash"))
         sm.add_widget(LoginSignupScreen(name="login"))
         sm.add_widget(HomeDashboardScreen(name="dashboard"))
-        # sm.add_widget(PatientScreen(name="patient"))
-        # sm.add_widget(DoctorScreen(name="doctor"))
+        sm.add_widget(PatientScreen(name="patient"))
+        sm.add_widget(DoctorScreen(name="doctor"))
         return sm
 
 
