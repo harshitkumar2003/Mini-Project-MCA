@@ -72,29 +72,37 @@ class LoginSignupScreen(Screen):
         role = self.ids.role_spinner.text.strip()
 
         if not adhar or not password or role not in ['User', 'Admin', 'Doctor', 'Patient']:
-           self.show_popup("Error", "Please fill all details and select a valid role.")
-           return
+            self.show_popup("Error", "Please fill all details and select a valid role.")
+            return
 
         conn = sqlite3.connect("users.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT password, role FROM users WHERE aadhaar=?", (adhar, password, role))
+
+        cursor.execute("SELECT password, role FROM users WHERE aadhaar=?", (adhar,))
         result = cursor.fetchone()
 
         if result is None:
             self.show_popup("Error", "User not found.")
         else:
             stored_password, stored_role = result
+
             if stored_password == password:
-            #! Role based screen redirection with typical permissions
-                stored_role_lower = stored_role.lower()
-                if stored_role_lower == 'patient':
-                    self.manager.current = 'patient'  # Patient dashboard
-                elif stored_role_lower == 'doctor':
-                    self.manager.current = 'doctor'  # Doctor dashboard
-                elif stored_role_lower == 'admin':
-                    self.manager.current = 'admin'   # Admin dashboard
-                elif stored_role_lower == 'user':
-                    self.manager.current = 'dashboard'  # General user/customer dashboard
+
+                if stored_role.lower() != role.lower():
+                    self.show_popup("Error", "You do not have permission for this role.")
+                    conn.close()
+                    return
+
+                #! Redirect based on role
+                r = stored_role.lower()
+                if r == 'patient':
+                    self.manager.current = 'patient'
+                elif r == 'doctor':
+                    self.manager.current = 'doctor'
+                elif r == 'admin':
+                    self.manager.current = 'admin'
+                elif r == 'user':
+                    self.manager.current = 'dashboard'
                 else:
                     self.show_popup("Error", "Invalid role assigned to user.")
             else:
