@@ -23,6 +23,20 @@
             padding: [24, 32, 24, 24]  # More top padding for floating effect
             spacing: 16
 
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: 40
+                Button:
+                    text: "home"
+                    size_hint_x: None
+                    width: 100
+                    background_color: 0.2, 0.6, 0.4, 1
+                    color: 1, 1, 1, 1
+                    font_size: "16sp"
+                    on_release:
+                        app.root.current = "landing"
+
             # (The rest of your existing content - keep unchanged)
             Image:
                 source: "assets/logo2.png"

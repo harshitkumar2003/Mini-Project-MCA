@@ -37,4 +37,4 @@ class SplashScreen(Screen):
 
     def switch_to_next(self, *args):
         self.manager.transition.direction = 'up'
-        self.manager.current = 'login'
+        self.manager.current = 'landing'

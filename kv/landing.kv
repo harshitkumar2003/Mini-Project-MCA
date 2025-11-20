@@ -1,0 +1,293 @@
+#:kivy 2.0.0
+
+<LandingScreen>:
+    name: 'landing'
+    
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 0
+        padding: 0
+        
+        # Header
+        BoxLayout:
+            size_hint_y: 0.12
+            padding: [20, 10]
+            canvas.before:
+                Color:
+                    rgba: 0.2, 0.6, 0.4, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            
+            Image:
+                source: 'assets/logo.png'
+                size_hint: None, 1
+                width: self.height
+                allow_stretch: True
+                
+            Label:
+                text: 'TrackHealth'
+                font_size: '24sp'
+                color: 1, 1, 1, 1
+                bold: True
+                size_hint_x: 0.7
+                
+            Button:
+                text: 'Login'
+                size_hint: None, None
+                size: [100, 40]
+                pos_hint: {'right': 0.95, 'center_y': 0.5}
+                background_color: 1, 1, 1, 0.2
+                color: 1, 1, 1, 1
+                on_release: app.root.current = 'login'
+        
+        # Main Content
+        ScrollView:
+            do_scroll_x: False
+            
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                padding: [20, 20]
+                spacing: 20
+                
+                # Hero Section
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: 300
+                    canvas.before:
+                        Color:
+                            rgba: 0.9, 0.96, 0.9, 1
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [15]
+                    
+                    Label:
+                        text: 'Your Health, Our Priority'
+                        font_size: '28sp'
+                        color: 0.1, 0.1, 0.1, 1
+                        bold: True
+                        size_hint_y: 0.4
+                        
+                    Label:
+                        text: 'Track symptoms, get insights, and connect with healthcare professionals'
+                        text_size: self.width, None
+                        halign: 'center'
+                        valign: 'middle'
+                        size_hint_y: 0.3
+                        color: 0.3, 0.3, 0.3, 1
+                        
+                    Button:
+                        text: 'Get Started'
+                        size_hint: None, None
+                        size: [200, 50]
+                        pos_hint: {'center_x': 0.5}
+                        background_color: 0.2, 0.6, 0.4, 1
+                        color: 1, 1, 1, 1
+                        font_size: '18sp'
+                        on_release: app.root.current = 'login'
+                
+                # Features Section
+                Label:
+                    text: 'Key Features'
+                    font_size: '24sp'
+                    color: 0.2, 0.2, 0.2, 1
+                    bold: True
+                    size_hint_y: None
+                    height: 50
+                
+                # Feature Cards
+                GridLayout:
+                    cols: 1
+                    spacing: 15
+                    size_hint_y: None
+                    height: self.minimum_height
+                    
+                    # Feature 1
+                    BoxLayout:
+                        size_hint_y: None
+                        height: 100
+                        canvas.before:
+                            Color:
+                                rgba: 0.95, 0.98, 0.95, 1
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [10]
+                        
+                        BoxLayout:
+                            padding: [15, 10]
+                            Image:
+                                source: 'assets/symptom_tracker.png'
+                                size_hint: None, 1
+                                width: self.height
+                            Label:
+                                text: 'Symptom Tracker\nMonitor your health with our easy-to-use symptom tracker'
+                                color: 0.2, 0.2, 0.2, 1
+                                text_size: self.width, None
+                                valign: 'middle'
+                                
+                    # Feature 2
+                    BoxLayout:
+                        size_hint_y: None
+                        height: 100
+                        canvas.before:
+                            Color:
+                                rgba: 0.95, 0.98, 0.95, 1
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [10]
+                        
+                        BoxLayout:
+                            padding: [15, 10]
+                            Image:
+                                source: 'assets/doctor_connect.png'
+                                size_hint: None, 1
+                                width: self.height
+                            Label:
+                                text: 'Doctor Connect\nConsult with certified healthcare professionals'
+                                color: 0.2, 0.2, 0.2, 1
+                                text_size: self.width, None
+                                valign: 'middle'
+                
+                # Trending Now Section
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: 250
+                    spacing: 10
+                    
+                    Label:
+                        text: 'Trending Health Topics'
+                        font_size: '20sp'
+                        color: 0.2, 0.2, 0.2, 1
+                        bold: True
+                        size_hint_y: 0.3
+                    
+                    ScrollView:
+                        size_hint_y: 0.7
+                        do_scroll_x: True
+                        do_scroll_y: False
+                        
+                        GridLayout:
+                            cols: 3
+                            spacing: 15
+                            size_hint_x: None
+                            width: self.minimum_width
+                            height: self.minimum_height
+                            
+                            # Trending Item 1
+                            BoxLayout:
+                                orientation: 'vertical'
+                                size_hint: None, None
+                                size: [200, 150]
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.95, 0.98, 0.95, 1
+                                    RoundedRectangle:
+                                        pos: self.pos
+                                        size: self.size
+                                        radius: [10]
+                                
+                                Image:
+                                    source: 'assets/covid19.jpg'
+                                    size_hint_y: 0.6
+                                Label:
+                                    text: 'COVID-19 Updates'
+                                    font_size: '14sp'
+                                    color: 0.2, 0.6, 0.4, 1
+                                    bold: True
+                            
+                            # Trending Item 2
+                            BoxLayout:
+                                orientation: 'vertical'
+                                size_hint: None, None
+                                size: [200, 150]
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.95, 0.98, 0.95, 1
+                                    RoundedRectangle:
+                                        pos: self.pos
+                                        size: self.size
+                                        radius: [10]
+                                
+                                Image:
+                                    source: 'assets/flu_season.jpg'
+                                    size_hint_y: 0.6
+                                Label:
+                                    text: 'Flu Season Guide'
+                                    font_size: '14sp'
+                                    color: 0.2, 0.6, 0.4, 1
+                                    bold: True
+                            
+                            # Trending Item 3
+                            BoxLayout:
+                                orientation: 'vertical'
+                                size_hint: None, None
+                                size: [200, 150]
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.95, 0.98, 0.95, 1
+                                    RoundedRectangle:
+                                        pos: self.pos
+                                        size: self.size
+                                        radius: [10]
+                                
+                                Image:
+                                    source: 'assets/mental_health.jpg'
+                                    size_hint_y: 0.6
+                                Label:
+                                    text: 'Mental Wellness'
+                                    font_size: '14sp'
+                                    color: 0.2, 0.6, 0.4, 1
+                                    bold: True
+                
+                # Call to Action
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: 200
+                    padding: [30, 20]
+                    canvas.before:
+                        Color:
+                            rgba: 0.2, 0.6, 0.4, 0.1
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [15]
+                    
+                    Label:
+                        text: 'Ready to take control of your health?'
+                        font_size: '22sp'
+                        color: 0.2, 0.2, 0.2, 1
+                        bold: True
+                        size_hint_y: 0.5
+                    
+                    Button:
+                        text: 'Sign Up Now'
+                        size_hint: None, None
+                        size: [200, 50]
+                        pos_hint: {'center_x': 0.5}
+                        background_color: 0.2, 0.6, 0.4, 1
+                        color: 1, 1, 1, 1
+                        font_size: '18sp'
+                        on_release: app.root.current = 'login'
+        
+        # Footer
+        BoxLayout:
+            size_hint_y: 0.08
+            canvas.before:
+                Color:
+                    rgba: 0.1, 0.1, 0.1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            
+            Label:
+                text: '© 2025 TrackHealth. All rights reserved.'
+                color: 0.8, 0.8, 0.8, 1
+                font_size: '12sp'
