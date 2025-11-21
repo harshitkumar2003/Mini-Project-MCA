@@ -1,0 +1,330 @@
+#:import dp kivy.metrics.dp
+#:import rgba kivy.utils.get_color_from_hex
+
+<CommonHeader@BoxLayout>:
+    orientation: "horizontal"
+    size_hint_y: None
+    height: dp(64)
+    padding: dp(12)
+    spacing: dp(12)
+    canvas.before:
+        Color:
+            rgba: 0.2, 0.72, 0.2, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Button:
+        background_normal: 'assets/reverse.png'
+        size_hint_x: 0.1
+        width: dp(10)
+        height: dp(15)
+        on_release:
+            app.root.current = "login"
+
+    Label:
+        id: hdr_label
+        text: root.title if hasattr(root, 'title') else "Admin Dashboard"
+        bold: True
+        font_size: '20sp'
+        color: 1, 1, 1, 1
+        size_hint_x: 0.5
+
+<HomeScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        canvas.before:
+            Color:
+                rgba: rgba("#F7FAFF")
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        CommonHeader:
+            title: "Admin Dashboard"
+
+        BoxLayout:
+            padding: dp(16)
+            spacing: dp(16)
+
+            BoxLayout:
+                orientation: "vertical"
+                size_hint_x: 0.45
+                spacing: dp(16)
+
+                BoxLayout:
+                    orientation: "horizontal"
+                    size_hint_y: None
+                    height: dp(200)
+                    padding: dp(18)
+                    spacing: dp(10)
+                    canvas.before:
+                        Color:
+                            rgba: .92, .96, 1, 1
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [18,]
+
+                    BoxLayout:
+                        orientation: "horizontal"
+                        spacing: dp(12)
+                        Label:
+                            text: "[b]Patients[/b]\nManage patient records"
+                            markup: True
+                            color: 0,0,0,1
+                        BoxLayout:
+                            size_hint_x: None
+                            width: dp(110)
+                            orientation: "vertical"
+                            spacing: dp(6)
+                            Button:
+                                text: "View"
+                                size_hint_y: None
+                                height: dp(36)
+                                on_release: app.root.current = "patient_list"
+                            Button:
+                                text: "Add"
+                                size_hint_y: None
+                                height: dp(36)
+                                on_release: app.root.current = "patient_add"
+
+                BoxLayout:
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: dp(160)
+                    padding: dp(14)
+                    spacing: dp(8)
+                    canvas.before:
+                        Color:
+                            rgba: .92, 1, .94, 1
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [12,]
+
+                    BoxLayout:
+                        orientation: "horizontal"
+                        spacing: dp(12)
+                        Label:
+                            text: "[b]Doctors[/b]\nManage doctor profiles"
+                            markup: True
+                            color: 0,0,0,1
+                        BoxLayout:
+                            size_hint_x: None
+                            width: dp(110)
+                            orientation: "vertical"
+                            spacing: dp(6)
+                            Button:
+                                text: "View"
+                                size_hint_y: None
+                                height: dp(36)
+                                on_release: app.root.current = "doctor_list"
+                            Button:
+                                text: "Add"
+                                size_hint_y: None
+                                height: dp(36)
+                                on_release: app.root.current = "doctor_add"
+
+            BoxLayout:
+                orientation: "vertical"
+                padding: dp(8)
+                spacing: dp(8)
+
+                Label:
+                    text: "[b]Welcome, Admin[/b]\nUse the cards on the left to manage records."
+                    markup: True
+                    size_hint_x: 0.5
+                    height: dp(80)
+                    color: 0,0,0,1
+
+                BoxLayout:
+                    id: table_area
+                    canvas.before:
+                        Color:
+                            rgba: .98, .98, .99, 1
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+# ---------------- Patient List Screen ----------------
+<PatientListScreen>:
+    page: 1
+    BoxLayout:
+        orientation: "vertical"
+        canvas.before:
+            Color:
+                rgba: rgba("#F8FBFF")
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        CommonHeader:
+            title: "Patient Records"
+
+        BoxLayout:
+            orientation: "vertical"
+            padding: dp(12)
+            spacing: dp(8)
+
+            BoxLayout:
+                size_hint_y: None
+                height: dp(48)
+                spacing: dp(8)
+                TextInput:
+                    id: patient_search
+                    hint_text: "Search Aadhaar"
+                    multiline: False
+                Button:
+                    text: "Search"
+                    size_hint_x: None
+                    width: dp(100)
+                    on_release: root.search_patient()
+                Button:
+                    text: "Clear"
+                    size_hint_x: None
+                    width: dp(100)
+                    on_release: root.clear_search()
+
+            ScrollView:
+                BoxLayout:
+                    id: patient_table_container
+                    size_hint_y: None
+                    height: self.minimum_height
+                    orientation: "vertical"
+                    padding: dp(8)
+
+            BoxLayout:
+                size_hint_y: None
+                height: dp(50)
+                spacing: dp(8)
+                Button:
+                    text: "Add New Patient"
+                    on_release: app.root.current = "patient_add"
+                Button:
+                    text: "Back"
+                    on_release: app.root.current = "admin_home"
+
+# ---------------- Patient Add / Edit Screen ----------------
+<PatientAddScreen>:
+    page: 1
+    BoxLayout:
+        orientation: "vertical"
+        canvas.before:
+            Color:
+                rgba: 1,1,1,1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        CommonHeader:
+            title: "Add / Edit Patient"
+
+        BoxLayout:
+            orientation: "vertical"
+            padding: dp(12)
+            spacing: dp(8)
+
+            Label:
+                id: page_label
+                text: "Page: " + str(root.page)
+                size_hint_y: None
+                height: dp(28)
+                color: 0,0,0,1
+
+            BoxLayout:
+                id: patient_form_area
+                orientation: "vertical"
+
+            BoxLayout:
+                size_hint_y: None
+                height: dp(56)
+                spacing: dp(8)
+                Button:
+                    text: "Previous"
+                    on_release: root.prev_page()
+                    disabled: root.page <= 1
+                Button:
+                    id: next_btn
+                    text: root.page < 3 and "Next" or "Save"
+                    on_release: root.next_page()
+                Button:
+                    text: "Cancel"
+                    on_release: root.cancel()
+
+# ---------------- Doctor List Screen ----------------
+<DoctorListScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        canvas.before:
+            Color:
+                rgba: rgba("#F7FFF8")
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        CommonHeader:
+            title: "Doctor Records"
+
+        BoxLayout:
+            orientation: "vertical"
+            padding: dp(12)
+            spacing: dp(8)
+
+            ScrollView:
+                BoxLayout:
+                    id: doctor_table_container
+                    size_hint_y: None
+                    height: self.minimum_height
+                    orientation: "vertical"
+                    padding: dp(8)
+
+            BoxLayout:
+                size_hint_y: None
+                height: dp(50)
+                spacing: dp(8)
+                Button:
+                    text: "Add New Doctor"
+                    on_release: app.root.current = "doctor_add"
+                Button:
+                    text: "Back"
+                    on_release: app.root.current = "admin_home"
+
+# ---------------- Doctor Add / Edit Screen ----------------
+<DoctorAddScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        canvas.before:
+            Color:
+                rgba: 1,1,1,1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        CommonHeader:
+            title: "Add / Edit Doctor"
+
+        ScrollView:
+            GridLayout:
+                id: doctor_form_area
+                cols: 1
+                padding: dp(12)
+                spacing: dp(8)
+                size_hint_y: None
+                height: self.minimum_height
+
+                Label:
+                    text: "Doctor form will appear here (Python inserts widgets)"
+                    size_hint_y: None
+                    height: dp(120)
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(56)
+            spacing: dp(8)
+            Button:
+                text: "Save"
+                on_release: root.save_doctor()
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
