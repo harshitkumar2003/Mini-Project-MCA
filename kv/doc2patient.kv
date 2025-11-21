@@ -1,0 +1,369 @@
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+
+# --- GLOBAL STYLES ---
+<Label>:
+    color: get_color_from_hex("#292b2aff")
+
+<RoundedBoxLayout>:
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: self.radius
+
+# --- NEW: PATIENT HEADER ---
+<PatientHeader>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: dp(160)
+    padding: dp(20)
+    spacing: dp(10)
+    background_color: get_color_from_hex("#e0e2e0ff")
+    
+    # Name and Icon
+    BoxLayout:
+        size_hint_y: None
+        height: dp(30)
+        spacing: dp(10)
+        Label:
+            text: "👤"
+            size_hint_x: None
+            width: dp(30)
+            font_size: '24sp'
+        Label:
+            text: root.patient_name
+            font_size: '20sp'
+            bold: True
+            halign: 'left'
+            valign: 'middle'
+            text_size: self.size
+            color: get_color_from_hex("#2C3E50")
+
+    # Divider Line
+    BoxLayout:
+        size_hint_y: None
+        height: dp(1)
+        canvas:
+            Color:
+                rgba: 0.9, 0.9, 0.9, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+    # Details Grid
+    GridLayout:
+        cols: 2
+        spacing: dp(5)
+        
+        # Left Column
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: "Gender: " + root.gender
+                halign: 'left'
+                text_size: self.size
+                font_size: '13sp'
+                color: get_color_from_hex("#555555")
+            Label:
+                text: "Room: " + root.room_no
+                halign: 'left'
+                text_size: self.size
+                font_size: '13sp'
+                color: get_color_from_hex("#555555")
+            Label:
+                text: "Aadhar: " + root.aadhar
+                halign: 'left'
+                text_size: self.size
+                font_size: '12sp'
+                color: get_color_from_hex("#888888")
+
+        # Right Column
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: "Blood: " + root.blood_group
+                halign: 'left'
+                text_size: self.size
+                font_size: '13sp'
+                color: get_color_from_hex("#E74C3C")
+                bold: True
+            Label:
+                text: "Ph: " + root.phone
+                halign: 'left'
+                text_size: self.size
+                font_size: '13sp'
+                color: get_color_from_hex("#555555")
+            Label:
+                text: "ID: #99281"
+                halign: 'left'
+                text_size: self.size
+                font_size: '12sp'
+                color: get_color_from_hex("#888888")
+
+
+# --- ALERT CARD ---
+<AlertCard>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: dp(90)
+    radius: [dp(15)]
+    background_color: get_color_from_hex("#E74C3C")
+    padding: dp(15)
+    spacing: dp(5)
+
+    BoxLayout:
+        size_hint_y: None
+        height: dp(20)
+        spacing: dp(10)
+        Label:
+            text: "🔔"
+            font_size: '16sp'
+            size_hint_x: None
+            width: dp(20)
+        Label:
+            text: "Urgent Alerts"
+            font_size: '16sp'
+            bold: True
+            color: 1, 1, 1, 1
+            halign: 'left'
+            text_size: self.size
+
+    Label:
+        text: "CRITICAL: Patient requires immediate attention regarding SpO2 levels."
+        font_size: '12sp'
+        color: 1, 1, 1, 1
+        text_size: self.size
+        halign: 'left'
+        valign: 'top'
+
+# --- NEW: BASIC REPORT SECTION (Stats Grid) ---
+<ReportCard>:
+    orientation: 'vertical'
+    padding: dp(10)
+    spacing: dp(5)
+    background_color: get_color_from_hex("#FFFFFF")
+    elevation: 2
+    
+    Label:
+        text: root.icon
+        font_size: '22sp'
+        size_hint_y: 0.4
+    Label:
+        text: root.value
+        font_size: '18sp'
+        bold: True
+        color: root.text_color
+        size_hint_y: 0.3
+    Label:
+        text: root.title
+        font_size: '11sp'
+        color: get_color_from_hex("#888888")
+        size_hint_y: 0.3
+
+<BasicReportSection>:
+    cols: 2
+    size_hint_y: None
+    height: dp(220)
+    spacing: dp(15)
+
+    # 1. Heart Rate
+    ReportCard:
+        icon: "❤️"
+        title: "Heart Rate"
+        value: "72 bpm"
+        text_color: get_color_from_hex("#E74C3C")
+
+    # 2. Blood Pressure
+    ReportCard:
+        icon: "🩸"
+        title: "Blood Pressure"
+        value: "120/80"
+        text_color: get_color_from_hex("#3498DB")
+
+    # 3. SpO2
+    ReportCard:
+        icon: "🌬️"
+        title: "SpO2"
+        value: "98 %"
+        text_color: get_color_from_hex("#27AE60")
+
+    # 4. Temperature
+    ReportCard:
+        icon: "🌡️"
+        title: "Temperature"
+        value: "98.6 °F"
+        text_color: get_color_from_hex("#F39C12")
+
+
+# --- VITALS SECTION (Graphs) ---
+<VitalsSection>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: dp(10)
+
+    Label:
+        text: "Graphical Trends"
+        font_size: '20sp'
+        bold: True
+        size_hint_y: None
+        height: dp(30)
+        halign: 'left'
+        text_size: self.size
+    
+    GridLayout:
+        cols: 2
+        spacing: dp(15)
+        size_hint_y: None
+        height: dp(180)
+        
+        # Heart Rate Graph Card
+        RoundedBoxLayout:
+            orientation: 'vertical'
+            padding: dp(10)
+            radius: [dp(10)]
+            Label:
+                text: "HR History"
+                font_size: '12sp'
+                color: get_color_from_hex("#AAAAAA")
+                size_hint_y: None
+                height: dp(15)
+                halign: 'left'
+                text_size: self.size
+            BoxLayout:
+                id: hr_container
+            Label:
+                text: "Last 24h"
+                font_size: '10sp'
+                color: get_color_from_hex("#AAAAAA")
+                size_hint_y: None
+                height: dp(12)
+                halign: 'right'
+                text_size: self.size
+
+        # Blood Pressure Graph Card
+        RoundedBoxLayout:
+            orientation: 'vertical'
+            padding: dp(10)
+            radius: [dp(10)]
+            Label:
+                text: "BP Trends"
+                font_size: '12sp'
+                color: get_color_from_hex("#AAAAAA")
+                size_hint_y: None
+                height: dp(15)
+                halign: 'left'
+                text_size: self.size
+            BoxLayout:
+                id: bp_container
+            Label:
+                text: "Last 24h"
+                font_size: '10sp'
+                color: get_color_from_hex("#AAAAAA")
+                size_hint_y: None
+                height: dp(12)
+                halign: 'right'
+                text_size: self.size
+
+# --- LAB ITEMS ---
+<LabItem>:
+    size_hint_y: None
+    height: dp(50)
+    spacing: dp(10)
+
+    RoundedBoxLayout:
+        size_hint: None, None
+        size: dp(40), dp(40)
+        radius: [dp(20)]
+        background_color: get_color_from_hex("#E0EFFF")
+        pos_hint: {'center_y': 0.5}
+        Label:
+            text: "📄"
+            font_size: '20sp'
+            color: get_color_from_hex("#3498DB")
+            halign: 'center'
+            valign: 'middle'
+
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: root.title
+            halign: 'left'
+            text_size: self.size
+            valign: 'bottom'
+            bold: True
+        Label:
+            text: root.subtitle
+            font_size: '12sp'
+            color: get_color_from_hex("#888888")
+            halign: 'left'
+            text_size: self.size
+            valign: 'top'
+
+    Label:
+        text: "Verified"
+        font_size: '12sp'
+        halign: 'right'
+        valign: 'middle'
+        text_size: self.size
+        color: get_color_from_hex("#27AE60")
+
+<LabsSection>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: dp(10)
+    
+    Label:
+        text: "Recent Lab Results"
+        font_size: '20sp'
+        bold: True
+        size_hint_y: None
+        height: dp(30)
+        halign: 'left'
+        text_size: self.size
+
+    BoxLayout:
+        id: lab_container
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: dp(10)
+
+
+# --- MAIN ROOT ---
+<DashboardRoot>:
+    do_scroll_x: False
+    
+    GridLayout:
+        cols: 1
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: dp(20)
+        padding: dp(15)
+        
+        # 1. Replaced Search Bar with Patient Info
+        PatientHeader:
+
+        # 2. Alert Card (Kept as is)
+        AlertCard:
+
+        # 3. Replaced Appointments with Basic Report Grid
+        Label:
+            text: "Current Vitals"
+            font_size: '20sp'
+            bold: True
+            size_hint_y: None
+            height: dp(20)
+            halign: 'left'
+            text_size: self.size
+            
+        BasicReportSection:
+
+        # 4. Graphs
+        VitalsSection:
+
+        # 5. Labs
+        LabsSection:
