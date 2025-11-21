@@ -1,6 +1,7 @@
 import kivy
 import random
 from kivy.app import App
+from kivy.uix.screenmanager import Screen
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -43,7 +44,7 @@ class PatientRow(BoxLayout):
         status_color = (0, 0.7, 0, 1) if status == "Stable" else (0.9, 0.1, 0.1, 1)
         self.add_widget(Label(text=status, color=status_color, size_hint_x=0.3, bold=True))
 
-class DoctorDashboard(FloatLayout):
+class DoctorDashboard(Screen):
     def on_kv_post(self, base_widget):
         """ Called once the KV file is fully loaded. """
         
@@ -91,9 +92,8 @@ class DoctorDashboard(FloatLayout):
         self.plot.points = new_points
 
     def go_back(self):
-        """ Function to exit the dashboard """
-        print("Back arrow clicked. Exiting...")
-        App.get_running_app().stop()
+        self.manager.current = "landing"
+
 
 class DoctorApp(App):
     def build(self):
