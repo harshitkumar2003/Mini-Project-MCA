@@ -8,13 +8,25 @@ from kivy.factory import Factory
 from kivy_garden.graph import Graph, LinePlot
 
 #! Import Screens to manage navigation between them 
-from screens.splash import SplashScreen          #todo: animation code for splash screen
-from screens.login import LoginSignupScreen      #todo: login and signup functionality
+from screens.splash import SplashScreen            #todo: animation code for splash screen
+from screens.login import LoginSignupScreen        #todo: login and signup functionality
 from screens.dashboard import HomeDashboardScreen  #todo: user dashboard after login
-from screens.landing import LandingScreen  # import landing screen
+from screens.landing import LandingScreen          #todo: import landing screen
+
+#! import admin screens
+from screens.admin import (    #todo: admin panel for managing users
+    HomeScreen,
+    PatientListScreen,
+    PatientAddScreen,
+    DoctorListScreen,
+    DoctorAddScreen
+)
+
 
 #! Output Screen Example: Mobile screen size (iPhone 14 approx)
-#Window.size = (250, 540)  #! Width x Height in pixels
+#Window.size = (490, 600)  #! Width x Height in pixels
+
+# Window.size = (250, 540)  #! Width x Height in pixels
 
 #! Register custom widgets from kivy_garden
 Factory.register('Graph', cls=Graph)
@@ -26,6 +38,7 @@ Builder.load_file("kv/splash.kv")
 Builder.load_file("kv/login.kv")
 Builder.load_file("kv/dashboard.kv")
 Builder.load_file("kv/landing.kv")
+Builder.load_file("kv/admin.kv")
 
 
 
@@ -42,7 +55,14 @@ class HealthcareApp(App):
         sm.add_widget(HomeDashboardScreen(name="dashboard"))
         # sm.add_widget(PatientScreen(name="patient"))
         # sm.add_widget(DoctorScreen(name="doctor"))
-        # sm.add_widget(AdminScreen(name="admin"))
+
+        #! Admin Screens (Danger Zone) - Access only for Admin Role -> 
+        sm.add_widget(HomeScreen(name="admin"))
+        sm.add_widget(HomeScreen(name="home"))
+        sm.add_widget(PatientListScreen(name="patient_list"))
+        sm.add_widget(PatientAddScreen(name="patient_add"))
+        sm.add_widget(DoctorListScreen(name="doctor_list"))
+        sm.add_widget(DoctorAddScreen(name="doctor_add"))
         sm.current = "splash"
         return sm
 
