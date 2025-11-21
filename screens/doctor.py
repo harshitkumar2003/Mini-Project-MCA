@@ -91,6 +91,10 @@ class DoctorDashboard(Screen):
             
         self.plot.points = new_points
 
+    def open_reports(self):
+        self.manager.current = "doc2patient"
+
+
     def go_back(self):
         self.manager.current = "landing"
 

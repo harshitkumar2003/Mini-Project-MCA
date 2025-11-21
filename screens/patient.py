@@ -2,12 +2,8 @@ import kivy
 import os
 import random
 from kivy.app import App
-<<<<<<< HEAD
 from kivy.uix.screenmanager import Screen
 from kivy.uix.floatlayout import FloatLayout # Changed from BoxLayout to FloatLayout
-=======
-from kivy.uix.floatlayout import FloatLayout
->>>>>>> ff5915046a1a117d8fd68246e590633fd2d1cdb2
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import StringProperty, ColorProperty
 from kivy.clock import Clock
@@ -37,12 +33,9 @@ class VitalBox(BoxLayout):
     unit = StringProperty('')
     box_color = ColorProperty((0, 0, 0, 1))
 
-<<<<<<< HEAD
 # INHERITANCE CHANGED: Now inherits from Screen to allow layering
 class PatientDashboard(Screen):
-=======
-class PatientDashboard(FloatLayout):
->>>>>>> ff5915046a1a117d8fd68246e590633fd2d1cdb2
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Schedule graph setup to run after the KV layout is fully loaded

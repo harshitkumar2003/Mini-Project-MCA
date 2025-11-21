@@ -14,6 +14,7 @@ from screens.dashboard import HomeDashboardScreen  #todo: user dashboard after l
 from screens.landing import LandingScreen          #todo: import landing screen
 from screens.patient import PatientDashboard
 from screens.doctor import DoctorDashboard
+from screens.doc2patient import Doctor2PatientDashboard  #! Doctor to Patient Report View
 
 #! import admin screens
 from screens.admin import (    #todo: admin panel for managing users
@@ -43,6 +44,7 @@ Builder.load_file("kv/landing.kv")
 Builder.load_file("kv/admin.kv")
 Builder.load_file("kv/patient.kv")
 Builder.load_file("kv/doctor.kv")
+Builder.load_file("kv/doc2patient.kv")  #! Doctor to Patient Report View
 
 
 
@@ -59,6 +61,7 @@ class HealthcareApp(App):
         sm.add_widget(HomeDashboardScreen(name="dashboard"))
         sm.add_widget(PatientDashboard(name="patient"))     
         sm.add_widget(DoctorDashboard(name="doctor"))
+        sm.add_widget(Doctor2PatientDashboard(name="doc2patient"))  #! Doctor to Patient Report View
 
         #! Admin Screens (Danger Zone) - Access only for Admin Role -> 
         sm.add_widget(HomeScreen(name="admin"))

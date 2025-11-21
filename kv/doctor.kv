@@ -106,7 +106,7 @@
                     text: 'Specialization:'
                     halign: 'right'
                 Label:
-                    text: 'Orthopeidx'
+                    text: 'Orthopedix'
                     color: get_color_from_hex("#333333")
                     halign: 'left'
                     text_size: self.size
@@ -116,7 +116,7 @@
                     text: 'Qualification:'
                     halign: 'right'
                 Label:
-                    text: 'MBBS'
+                    text: 'M.B.B.S'
                     color: get_color_from_hex("#333333")
                     halign: 'left'
                     text_size: self.size
@@ -189,6 +189,8 @@
                 ActionButton:
                     text: "View Reports"
                     background_color: get_color_from_hex("#2ECC71")
+                    on_release: app.root.current = "doc2patient"
+
 
             # --- Graph Section ---
             BoldLabel:

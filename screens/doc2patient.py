@@ -3,6 +3,7 @@ import kivy
 import os
 import random
 from kivy.app import App
+from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
@@ -58,7 +59,6 @@ class BasicReportSection(GridLayout):
 
 class AlertCard(RoundedBoxLayout):
     pass
-
 class VitalsSection(BoxLayout):
     def on_kv_post(self, base_widget):
         """ Called after KV is loaded. Initialize data and start clock. """
@@ -149,11 +149,10 @@ class LabsSection(BoxLayout):
 class DashboardRoot(ScrollView):
     pass
 
-class PatientDashboardApp(App):
-    def build(self):
-        Window.clearcolor = get_color_from_hex("#75D37D")
-        Window.size = (400, 800)
-        return DashboardRoot()
+# ------------------------------------------------------
+#  MAIN SCREEN CLASS (IMPORTANT)
+# ------------------------------------------------------
 
-if __name__ == '__main__':
-    PatientDashboardApp().run()
+class Doctor2PatientDashboard(Screen):
+    """ Main Screen to be loaded inside main.py """
+    pass
