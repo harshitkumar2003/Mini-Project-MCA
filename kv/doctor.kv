@@ -75,11 +75,75 @@
         # ==========================================
         # SCROLLABLE CONTENT AREA
         # ==========================================
+<<<<<<< HEAD
         ScrollView:
             do_scroll_x: False
             do_scroll_y: True
             
             # The container for all content
+=======
+        BoxLayout:
+            orientation: 'vertical'
+            padding: dp(15)
+            spacing: dp(10)
+
+            # --- Doctor Info Grid ---
+            GridLayout:
+                cols: 4
+                size_hint_y: 0.1
+                spacing: dp(10)
+                
+                BoldLabel:
+                    text: 'Doctor Name:'
+                    halign: 'right'
+                Label:
+                    text: 'Dr. Suraj Tomer'
+                    color: get_color_from_hex("#333333")
+                    halign: 'left'
+                    text_size: self.size
+                    valign: 'middle'
+
+                BoldLabel:
+                    text: 'Specialization:'
+                    halign: 'right'
+                Label:
+                    text: 'Orthopedix'
+                    color: get_color_from_hex("#333333")
+                    halign: 'left'
+                    text_size: self.size
+                    valign: 'middle'
+
+                BoldLabel:
+                    text: 'Qualification:'
+                    halign: 'right'
+                Label:
+                    text: 'M.B.B.S'
+                    color: get_color_from_hex("#333333")
+                    halign: 'left'
+                    text_size: self.size
+                    valign: 'middle'
+
+                BoldLabel:
+                    text: 'Clinic Hospital:'
+                    halign: 'right'
+                Label:
+                    text: 'Lakshya Hospital'
+                    color: get_color_from_hex("#333333")
+                    halign: 'left'
+                    text_size: self.size
+                    valign: 'middle'
+
+            # --- Patient List Title ---
+            BoldLabel:
+                text: 'My Patients Overview'
+                font_size: '24sp'
+                size_hint_y: 0.06
+                text_size: self.size
+                halign: 'left'
+                valign: 'bottom'
+
+            # --- PATIENT OVERVIEW SECTION ---
+>>>>>>> fd4089ca7b140192055841d60de2614bbcb81aca
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
@@ -88,6 +152,7 @@
                 padding: dp(15)
                 spacing: dp(10)
 
+<<<<<<< HEAD
                 # --- Doctor Info Grid ---
                 GridLayout:
                     cols: 4
@@ -104,6 +169,19 @@
                         halign: 'left'
                         text_size: self.size
                         valign: 'middle'
+=======
+                ActionButton:
+                    text: "New Alert (2)"
+                    background_color: get_color_from_hex("#E74C3C")
+                ActionButton:
+                    text: "Appointments (3)"
+                    background_color: get_color_from_hex("#3498DB")
+                ActionButton:
+                    text: "View Reports"
+                    background_color: get_color_from_hex("#2ECC71")
+                    on_release: app.root.current = "doc2patient"
+
+>>>>>>> fd4089ca7b140192055841d60de2614bbcb81aca
 
                     BoldLabel:
                         text: 'Specialization:'
