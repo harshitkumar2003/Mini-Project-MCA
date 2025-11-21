@@ -8,7 +8,11 @@ from kivy.clock import Clock
 from kivy.utils import get_color_from_hex
 from kivy.lang import Builder
 from kivy.core.window import Window
+from kivy.metrics import dp
 import os
+
+# Set a standard size for testing on PC, remove this for mobile
+Window.size = (400, 750)
 
 # --- Import Graph Components ---
 try:
@@ -19,13 +23,14 @@ except ImportError:
     exit()
 
 # --- Load the KV file ---
-# This tries to load directly, or from a 'kv' subdirectory if it exists.
-kv_file_name = 'doctor.kv'
-if os.path.exists(os.path.join('kv', "doctor.kv")):
-    Builder.load_file(os.path.join('kv', "doctor.kv"))
+# Ensures it loads doctor.kv regardless of where you run the script from
+if os.path.exists('doctor.kv'):
+    Builder.load_file('doctor.kv')
+elif os.path.exists('kv/doctor.kv'):
+    Builder.load_file('kv/doctor.kv')
 else:
-    Builder.load_file("kv/doctor2.kv")
-
+    # Fallback string loading if file is missing (Optional, but good for debugging)
+    print("Warning: doctor.kv not found, ensure it is in the same directory.")
 
 class PatientRow(BoxLayout):
     """ Represents a single row in the patient list """
@@ -33,15 +38,15 @@ class PatientRow(BoxLayout):
         super().__init__(**kwargs)
         self.orientation = 'horizontal'
         self.size_hint_y = None
-        self.height = "40dp"
-        self.padding = "5dp"
+        self.height = dp(40)
+        self.padding = dp(5)
         
         # Simple styling for the row
-        self.add_widget(Label(text=name, color=(0,0,0,1), size_hint_x=0.4, halign='left', text_size=(self.width, None)))
-        self.add_widget(Label(text=condition, color=(0.3,0.3,0.3,1), size_hint_x=0.3))
+        self.add_widget(Label(text=name, color=(0,0,0,1), size_hint_x=0.4, halign='left', valign='middle'))
+        self.add_widget(Label(text=condition, color=(0.3,0.3,0.3,1), size_hint_x=0.3, valign='middle'))
         
         status_color = (0, 0.7, 0, 1) if status == "Stable" else (0.9, 0.1, 0.1, 1)
-        self.add_widget(Label(text=status, color=status_color, size_hint_x=0.3, bold=True))
+        self.add_widget(Label(text=status, color=status_color, size_hint_x=0.3, bold=True, valign='middle'))
 
 class DoctorDashboard(FloatLayout):
     def on_kv_post(self, base_widget):
@@ -72,8 +77,14 @@ class DoctorDashboard(FloatLayout):
             ("Atul", "Fracture", "Stable"),
             ("Anshul", "Migraine", "Stable"),
             ("Shivam", "Diabetes", "Critical"),
+            ("Rahul", "Viral", "Stable"), # Added to demonstrate scrolling
+            ("Priya", "Dengue", "Critical"),
+            ("Amit", "Ortho", "Stable"),
         ]
         grid = self.ids.patient_grid_id
+        # Clear widgets first to prevent duplicates if re-run
+        grid.clear_widgets()
+        
         for name, cond, stat in patients:
             row = PatientRow(name, cond, stat)
             grid.add_widget(row)
