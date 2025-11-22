@@ -105,7 +105,7 @@ class PatientDashboardApp(App):
         return PatientDashboard()
     
     def go_back(self):
-        self.manager.current = "landing"
+        self.manager.current = 'landing'
 
 if __name__ == '__main__':
     PatientDashboardApp().run()

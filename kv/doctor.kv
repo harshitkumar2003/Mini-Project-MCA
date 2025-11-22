@@ -14,22 +14,19 @@
 
 # --- Main Dashboard Layout ---
 <DoctorDashboard>:
-    # 1. BASE LAYER: Solid White Canvas
+    # Background (non scrollable)
     canvas.before:
         Color:
-            rgba: 1, 1, 1, 1 # White
+            rgba: 1, 1, 1, 1
         Rectangle:
             pos: self.pos
             size: self.size
-
-    # 2. BACKGROUND IMAGE LAYER (Fixed, does not scroll)
-    Image:
-        source: 'assets/ill-2.png'  # Ensure your image path is correct
-        allow_stretch: True
-        keep_ratio: True    
-        size_hint: 1, 1     
-        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-        opacity: 0.25
+        Color:
+            rgba: 1, 1, 1, .25
+        Rectangle:
+            source: "assets/ill-2.png"
+            pos: self.pos
+            size: self.size
 
     # 3. MAIN LAYOUT STRUCTURE
     BoxLayout:
@@ -48,7 +45,7 @@
             
             canvas.before:
                 Color:
-                    rgba: get_color_from_hex("#2ECC71") # Medical Blue
+                    rgba: get_color_from_hex("#34db6cff") # Medical Blue
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -75,87 +72,22 @@
         # ==========================================
         # SCROLLABLE CONTENT AREA
         # ==========================================
-<<<<<<< HEAD
         ScrollView:
             do_scroll_x: False
             do_scroll_y: True
             
             # The container for all content
-=======
-        BoxLayout:
-            orientation: 'vertical'
-            padding: dp(15)
-            spacing: dp(10)
-
-            # --- Doctor Info Grid ---
-            GridLayout:
-                cols: 4
-                size_hint_y: 0.1
-                spacing: dp(10)
-                
-                BoldLabel:
-                    text: 'Doctor Name:'
-                    halign: 'right'
-                Label:
-                    text: 'Dr. Suraj Tomer'
-                    color: get_color_from_hex("#333333")
-                    halign: 'left'
-                    text_size: self.size
-                    valign: 'middle'
-
-                BoldLabel:
-                    text: 'Specialization:'
-                    halign: 'right'
-                Label:
-                    text: 'Orthopedix'
-                    color: get_color_from_hex("#333333")
-                    halign: 'left'
-                    text_size: self.size
-                    valign: 'middle'
-
-                BoldLabel:
-                    text: 'Qualification:'
-                    halign: 'right'
-                Label:
-                    text: 'M.B.B.S'
-                    color: get_color_from_hex("#333333")
-                    halign: 'left'
-                    text_size: self.size
-                    valign: 'middle'
-
-                BoldLabel:
-                    text: 'Clinic Hospital:'
-                    halign: 'right'
-                Label:
-                    text: 'Lakshya Hospital'
-                    color: get_color_from_hex("#333333")
-                    halign: 'left'
-                    text_size: self.size
-                    valign: 'middle'
-
-            # --- Patient List Title ---
-            BoldLabel:
-                text: 'My Patients Overview'
-                font_size: '24sp'
-                size_hint_y: 0.06
-                text_size: self.size
-                halign: 'left'
-                valign: 'bottom'
-
-            # --- PATIENT OVERVIEW SECTION ---
->>>>>>> fd4089ca7b140192055841d60de2614bbcb81aca
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
                 # Automatically calculates height based on children
                 height: self.minimum_height 
                 padding: dp(15)
-                spacing: dp(10)
+                spacing: dp(15)
 
-<<<<<<< HEAD
                 # --- Doctor Info Grid ---
                 GridLayout:
-                    cols: 4
+                    cols: 2
                     size_hint_y: None
                     height: dp(80) # Fixed height for info area
                     spacing: dp(5)
@@ -169,19 +101,6 @@
                         halign: 'left'
                         text_size: self.size
                         valign: 'middle'
-=======
-                ActionButton:
-                    text: "New Alert (2)"
-                    background_color: get_color_from_hex("#E74C3C")
-                ActionButton:
-                    text: "Appointments (3)"
-                    background_color: get_color_from_hex("#3498DB")
-                ActionButton:
-                    text: "View Reports"
-                    background_color: get_color_from_hex("#2ECC71")
-                    on_release: app.root.current = "doc2patient"
-
->>>>>>> fd4089ca7b140192055841d60de2614bbcb81aca
 
                     BoldLabel:
                         text: 'Specialization:'
@@ -228,7 +147,7 @@
                     orientation: 'vertical'
                     size_hint_y: None
                     height: dp(250) # FIXED HEIGHT ensures inner scroll works
-                    padding: dp(2)
+                    padding: dp(5)
                     
                     canvas.before:
                         Color:
@@ -239,6 +158,7 @@
 
                     ScrollView:
                         do_scroll_x: False
+                        do_scroll_y: True
                         bar_width: dp(10)
                         
                         GridLayout:
@@ -274,6 +194,7 @@
                     ActionButton:
                         text: "View Reports"
                         background_color: get_color_from_hex("#2ECC71")
+                        on_release: root.open_reports()
 
                 # --- Graph Title ---
                 BoldLabel:
