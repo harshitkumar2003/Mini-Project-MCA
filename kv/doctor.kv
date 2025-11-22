@@ -14,21 +14,13 @@
 
 # --- Main Dashboard Layout ---
 <DoctorDashboard>:
-    # Background (non scrollable)
+    # 1. BASE LAYER: Solid White Canvas
     canvas.before:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: 1, 1, 1, 1 # White
         Rectangle:
             pos: self.pos
             size: self.size
-<<<<<<< HEAD
-        Color:
-            rgba: 1, 1, 1, .25
-        Rectangle:
-            source: "assets/ill-2.png"
-            pos: self.pos
-            size: self.size
-=======
 
     # 2. BACKGROUND IMAGE LAYER (Fixed, does not scroll)
     Image:
@@ -50,7 +42,6 @@
                 pos: self.pos
                 size: self.size
             StencilPop
->>>>>>> 7be6c96923d8c61b82e3c728f70b6b9aa38d44cb
 
     # 3. MAIN LAYOUT STRUCTURE
     BoxLayout:
@@ -69,7 +60,7 @@
             
             canvas.before:
                 Color:
-                    rgba: get_color_from_hex("#34db6cff") # Medical Blue
+                    rgba: get_color_from_hex("#2ECC71") # Medical Blue
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -108,19 +99,6 @@
             effect_cls: 'ScrollEffect'
             
             # The container for all content
-<<<<<<< HEAD
-            BoxLayout:
-                orientation: 'vertical'
-                size_hint_y: None
-                # Automatically calculates height based on children
-                height: self.minimum_height 
-                padding: dp(15)
-                spacing: dp(15)
-
-                # --- Doctor Info Grid ---
-                GridLayout:
-                    cols: 2
-=======
             GridLayout:
                 id: content_container
                 cols: 1
@@ -138,7 +116,6 @@
                 # --- Doctor Info Card ---
                 BoxLayout:
                     orientation: 'vertical'
->>>>>>> 7be6c96923d8c61b82e3c728f70b6b9aa38d44cb
                     size_hint_y: None
                     height: self.minimum_height
                     padding: dp(15)
@@ -251,14 +228,9 @@
                 BoxLayout:
                     orientation: 'vertical'
                     size_hint_y: None
-<<<<<<< HEAD
-                    height: dp(250) # FIXED HEIGHT ensures inner scroll works
-                    padding: dp(5)
-=======
                     height: dp(300)  # Increased height for better visibility
                     padding: dp(15)
                     spacing: dp(10)
->>>>>>> 7be6c96923d8c61b82e3c728f70b6b9aa38d44cb
                     
                     canvas.before:
                         Color:
@@ -305,17 +277,12 @@
                         id: patient_scroll
                         size_hint_y: 1
                         do_scroll_x: False
-<<<<<<< HEAD
-                        do_scroll_y: True
-                        bar_width: dp(10)
-=======
                         bar_width: dp(5)
                         bar_color: get_color_from_hex("#2ECC77")
                         bar_inactive_color: get_color_from_hex("#A5D6A7")
                         bar_margin: dp(1)
                         scroll_type: ['bars', 'content']
                         effect_cls: 'ScrollEffect'
->>>>>>> 7be6c96923d8c61b82e3c728f70b6b9aa38d44cb
                         
                         GridLayout:
                             id: patient_grid_id 
@@ -357,7 +324,6 @@
                     ActionButton:
                         text: "View Reports"
                         background_color: get_color_from_hex("#2ECC71")
-                        on_release: root.open_reports()
 
                 # --- Section Spacer ---
                 BoxLayout:
