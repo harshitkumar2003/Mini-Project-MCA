@@ -12,6 +12,9 @@ from kivy.core.window import Window
 from kivy.metrics import dp
 import os
 
+# Set a standard size for testing on PC, remove this for mobile
+Window.size = (400, 750)
+
 # --- Import Graph Components ---
 try:
     from kivy_garden.graph import Graph, MeshLinePlot
@@ -34,37 +37,17 @@ class PatientRow(BoxLayout):
     """ Represents a single row in the patient list """
     def __init__(self, name, condition, status, **kwargs):
         super().__init__(**kwargs)
-
         self.orientation = 'horizontal'
         self.size_hint_y = None
         self.height = dp(40)
         self.padding = dp(5)
-
+        
         # Simple styling for the row
-        self.add_widget(Label(
-            text=name,
-            color=(0,0,0,1),
-            size_hint_x=0.4,
-            halign='left',
-            valign='middle'
-        ))
-
-        self.add_widget(Label(
-            text=condition,
-            color=(0.3,0.3,0.3,1),
-            size_hint_x=0.3,
-            valign='middle'
-        ))
-
+        self.add_widget(Label(text=name, color=(0,0,0,1), size_hint_x=0.4, halign='left', valign='middle'))
+        self.add_widget(Label(text=condition, color=(0.3,0.3,0.3,1), size_hint_x=0.3, valign='middle'))
+        
         status_color = (0, 0.7, 0, 1) if status == "Stable" else (0.9, 0.1, 0.1, 1)
-
-        self.add_widget(Label(
-            text=status,
-            color=status_color,
-            size_hint_x=0.3,
-            bold=True,
-            valign='middle'
-        ))
+        self.add_widget(Label(text=status, color=status_color, size_hint_x=0.3, bold=True, valign='middle'))
 
 class DoctorDashboard(Screen):
     def on_kv_post(self, base_widget):
@@ -126,11 +109,12 @@ class DoctorDashboard(Screen):
     def go_back(self):
         self.manager.current = "landing"
 
+
 class DoctorApp(App):
     def build(self):
         # Set window background to white as a fallback
         Window.clearcolor = (1, 1, 1, 1)
         return DoctorDashboard()
 
-if __name__ == '_main_':
+if __name__ == '__main__':
     DoctorApp().run()
