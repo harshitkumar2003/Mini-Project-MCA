@@ -29,7 +29,19 @@
         keep_ratio: True    
         size_hint: 1, 1     
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-        opacity: 0.25
+        opacity: 0.1  # Reduced opacity for better text visibility
+        # Ensure background stays in the background
+        canvas.before:
+            StencilPush
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        canvas.after:
+            StencilUnUse
+            Rectangle:
+                pos: self.pos
+                size: self.size
+            StencilPop
 
     # 3. MAIN LAYOUT STRUCTURE
     BoxLayout:
@@ -54,7 +66,7 @@
                     size: self.size
 
             Button:
-                text: "←"
+                text: "<-"
                 font_size: '30sp'
                 bold: True
                 size_hint_x: None
@@ -75,179 +87,216 @@
         # ==========================================
         # SCROLLABLE CONTENT AREA
         # ==========================================
-<<<<<<< HEAD
         ScrollView:
+            id: main_scroll
             do_scroll_x: False
             do_scroll_y: True
+            bar_width: dp(8)
+            bar_color: get_color_from_hex("#2ECC77")
+            bar_inactive_color: get_color_from_hex("#A5D6A7")
+            bar_margin: dp(2)
+            scroll_type: ['bars', 'content']
+            effect_cls: 'ScrollEffect'
             
             # The container for all content
-=======
-        BoxLayout:
-            orientation: 'vertical'
-            padding: dp(15)
-            spacing: dp(10)
-
-            # --- Doctor Info Grid ---
             GridLayout:
-                cols: 4
-                size_hint_y: 0.1
-                spacing: dp(10)
-                
-                BoldLabel:
-                    text: 'Doctor Name:'
-                    halign: 'right'
-                Label:
-                    text: 'Dr. Suraj Tomer'
-                    color: get_color_from_hex("#333333")
-                    halign: 'left'
-                    text_size: self.size
-                    valign: 'middle'
-
-                BoldLabel:
-                    text: 'Specialization:'
-                    halign: 'right'
-                Label:
-                    text: 'Orthopedix'
-                    color: get_color_from_hex("#333333")
-                    halign: 'left'
-                    text_size: self.size
-                    valign: 'middle'
-
-                BoldLabel:
-                    text: 'Qualification:'
-                    halign: 'right'
-                Label:
-                    text: 'M.B.B.S'
-                    color: get_color_from_hex("#333333")
-                    halign: 'left'
-                    text_size: self.size
-                    valign: 'middle'
-
-                BoldLabel:
-                    text: 'Clinic Hospital:'
-                    halign: 'right'
-                Label:
-                    text: 'Lakshya Hospital'
-                    color: get_color_from_hex("#333333")
-                    halign: 'left'
-                    text_size: self.size
-                    valign: 'middle'
-
-            # --- Patient List Title ---
-            BoldLabel:
-                text: 'My Patients Overview'
-                font_size: '24sp'
-                size_hint_y: 0.06
-                text_size: self.size
-                halign: 'left'
-                valign: 'bottom'
-
-            # --- PATIENT OVERVIEW SECTION ---
->>>>>>> fd4089ca7b140192055841d60de2614bbcb81aca
-            BoxLayout:
-                orientation: 'vertical'
+                id: content_container
+                cols: 1
                 size_hint_y: None
-                # Automatically calculates height based on children
-                height: self.minimum_height 
-                padding: dp(15)
-                spacing: dp(10)
-
-<<<<<<< HEAD
-                # --- Doctor Info Grid ---
-                GridLayout:
-                    cols: 4
+                height: self.minimum_height
+                padding: [dp(15), dp(15), dp(15), dp(15)]  # top, right, bottom, left
+                spacing: dp(15)
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                
+                # --- Doctor Info Card ---
+                BoxLayout:
+                    orientation: 'vertical'
                     size_hint_y: None
-                    height: dp(80) # Fixed height for info area
-                    spacing: dp(5)
+                    height: self.minimum_height
+                    padding: dp(15)
+                    spacing: dp(10)
+                    canvas.before:
+                        Color:
+                            rgba: get_color_from_hex("#FFFFFF")
+                        RoundedRectangle:
+                            size: self.size
+                            pos: self.pos
+                            radius: [10,]
+                        Color:
+                            rgba: get_color_from_hex("#E0E0E0")
+                        Line:
+                            rounded_rectangle: [self.x, self.y, self.width, self.height, 10]
+                            width: 1
+                    
+                    # Shadow effect
+                    canvas.after:
+                        Color:
+                            rgba: 0, 0, 0, 0.1
+                        RoundedRectangle:
+                            size: (self.width + 10, self.height + 10)
+                            pos: (self.x - 5, self.y - 5)
+                            radius: [10,]
+                    
+                    Label:
+                        text: 'Doctor Profile'
+                        font_size: '18sp'
+                        bold: True
+                        size_hint_y: None
+                        height: dp(30)
+                        color: get_color_from_hex("#2C3E50")
+                        
+                    GridLayout:
+                        cols: 2
+                        size_hint_y: None
+                        height: self.minimum_height
+                        spacing: [dp(10), dp(8)]  # horizontal, vertical spacing
                     
                     BoldLabel:
                         text: 'Doctor Name:'
-                        halign: 'right'
+                        halign: 'left'
                     Label:
                         text: 'Dr. Suraj Tomer'
                         color: get_color_from_hex("#333333")
-                        halign: 'left'
+                        halign: 'right'
                         text_size: self.size
                         valign: 'middle'
-=======
-                ActionButton:
-                    text: "New Alert (2)"
-                    background_color: get_color_from_hex("#E74C3C")
-                ActionButton:
-                    text: "Appointments (3)"
-                    background_color: get_color_from_hex("#3498DB")
-                ActionButton:
-                    text: "View Reports"
-                    background_color: get_color_from_hex("#2ECC71")
-                    on_release: app.root.current = "doc2patient"
-
->>>>>>> fd4089ca7b140192055841d60de2614bbcb81aca
 
                     BoldLabel:
                         text: 'Specialization:'
-                        halign: 'right'
+                        halign: 'left'
                     Label:
                         text: 'Orthopedics'
                         color: get_color_from_hex("#333333")
-                        halign: 'left'
+                        halign: 'right'
                         text_size: self.size
                         valign: 'middle'
 
                     BoldLabel:
                         text: 'Qualification:'
-                        halign: 'right'
+                        halign: 'left'
                     Label:
                         text: 'MBBS'
                         color: get_color_from_hex("#333333")
-                        halign: 'left'
+                        halign: 'right'
                         text_size: self.size
                         valign: 'middle'
 
                     BoldLabel:
                         text: 'Clinic:'
-                        halign: 'right'
+                        halign: 'left'
                     Label:
                         text: 'Lakshya Hospital'
                         color: get_color_from_hex("#333333")
-                        halign: 'left'
+                        halign: 'right'
                         text_size: self.size
                         valign: 'middle'
 
-                # --- Patient List Title ---
-                BoldLabel:
-                    text: 'My Patients Overview'
-                    font_size: '22sp'
+                # --- Section Spacer ---
+                BoxLayout:
+                    size_hint_y: None
+                    height: dp(10)
+                    
+                # --- Patient List Header ---
+                BoxLayout:
+                    orientation: 'horizontal'
                     size_hint_y: None
                     height: dp(40)
-                    text_size: self.size
-                    halign: 'left'
-                    valign: 'bottom'
+                    
+                    BoldLabel:
+                        text: 'My Patients Overview'
+                        font_size: '20sp'
+                        text_size: self.size
+                        halign: 'left'
+                        valign: 'middle'
+                        color: get_color_from_hex("#2C3E50")
+                        
+                    Label:
+                        text: 'View All >'
+                        color: get_color_from_hex("#2ECC77")
+                        font_size: '14sp'
+                        size_hint_x: 0.3
+                        text_size: self.size
+                        halign: 'right'
+                        valign: 'middle'
 
-                # --- PATIENT OVERVIEW SECTION (Nested Scroll) ---
+                # --- PATIENT OVERVIEW SECTION ---
                 BoxLayout:
                     orientation: 'vertical'
                     size_hint_y: None
-                    height: dp(250) # FIXED HEIGHT ensures inner scroll works
-                    padding: dp(2)
+                    height: dp(300)  # Increased height for better visibility
+                    padding: dp(15)
+                    spacing: dp(10)
                     
                     canvas.before:
                         Color:
-                            rgba: 0, 0, 0, 1
+                            rgba: get_color_from_hex("#FFFFFF")
+                        RoundedRectangle:
+                            size: self.size
+                            pos: self.pos
+                            radius: [10,]
+                        Color:
+                            rgba: get_color_from_hex("#E0E0E0")
                         Line:
-                            width: 1.5
-                            rectangle: self.x, self.y, self.width, self.height
-
+                            rounded_rectangle: [self.x, self.y, self.width, self.height, 10]
+                            width: 1
+                    
+                    # Patient list header
+                    BoxLayout:
+                        size_hint_y: None
+                        height: dp(40)
+                        padding: [0, 0, dp(5), 0]  # Right padding for scrollbar
+                        
+                        Label:
+                            text: 'Patient Name'
+                            color: get_color_from_hex("#666666")
+                            font_size: '14sp'
+                            bold: True
+                            size_hint_x: 0.4
+                            
+                        Label:
+                            text: 'Last Visit'
+                            color: get_color_from_hex("#666666")
+                            font_size: '14sp'
+                            bold: True
+                            size_hint_x: 0.3
+                            
+                        Label:
+                            text: 'Status'
+                            color: get_color_from_hex("#666666")
+                            font_size: '14sp'
+                            bold: True
+                            size_hint_x: 0.3
+                    
+                    # Scrollable patient list
                     ScrollView:
+                        id: patient_scroll
+                        size_hint_y: 1
                         do_scroll_x: False
-                        bar_width: dp(10)
+                        bar_width: dp(5)
+                        bar_color: get_color_from_hex("#2ECC77")
+                        bar_inactive_color: get_color_from_hex("#A5D6A7")
+                        bar_margin: dp(1)
+                        scroll_type: ['bars', 'content']
+                        effect_cls: 'ScrollEffect'
                         
                         GridLayout:
                             id: patient_grid_id 
                             cols: 1
                             size_hint_y: None
                             height: self.minimum_height
-                            spacing: dp(2)
+                            spacing: dp(8)
+                            padding: [0, 0, dp(5), 0]  # Right padding for scrollbar
 
+                # --- Section Spacer ---
+                BoxLayout:
+                    size_hint_y: None
+                    height: dp(10)
+                    
                 # --- Quick Actions Title ---
                 BoldLabel:
                     text: 'Quick Actions'
@@ -257,6 +306,7 @@
                     text_size: self.size
                     halign: 'left'
                     valign: 'bottom'
+                    color: get_color_from_hex("#2C3E50")
 
                 # --- Quick Action Buttons ---
                 GridLayout:
@@ -275,6 +325,11 @@
                         text: "View Reports"
                         background_color: get_color_from_hex("#2ECC71")
 
+                # --- Section Spacer ---
+                BoxLayout:
+                    size_hint_y: None
+                    height: dp(10)
+                    
                 # --- Graph Title ---
                 BoldLabel:
                     text: 'Overall Patient Vitals Trend'
@@ -284,13 +339,55 @@
                     text_size: self.size
                     halign: 'left'
                     valign: 'bottom'
+                    color: get_color_from_hex("#2C3E50")
 
                 # --- Graph Section ---
-                AnchorLayout:
-                    anchor_x: 'center'
-                    anchor_y: 'center'
+                BoxLayout:
+                    orientation: 'vertical'
                     size_hint_y: None
-                    height: dp(300) # Fixed height for graph
+                    height: dp(350)  # Increased height for better visibility
+                    padding: dp(15)
+                    spacing: dp(10)
+                    canvas.before:
+                        Color:
+                            rgba: get_color_from_hex("#FFFFFF")
+                        RoundedRectangle:
+                            size: self.size
+                            pos: self.pos
+                            radius: [10,]
+                        Color:
+                            rgba: get_color_from_hex("#E0E0E0")
+                        Line:
+                            rounded_rectangle: [self.x, self.y, self.width, self.height, 10]
+                            width: 1
+                    
+                    # Graph title and controls
+                    BoxLayout:
+                        size_hint_y: None
+                        height: dp(40)
+                        padding: [0, 0, dp(10), 0]  # Right padding for controls
+                        
+                        Label:
+                            text: 'Patient Vitals Trend (Last 7 Days)'
+                            color: get_color_from_hex("#2C3E50")
+                            font_size: '16sp'
+                            bold: True
+                            size_hint_x: 0.7
+                            
+                        # Graph controls would go here
+                        # Example: Time range selector
+                        Spinner:
+                            text: 'Weekly'
+                            values: ['Daily', 'Weekly', 'Monthly']
+                            size_hint_x: 0.3
+                            background_color: get_color_from_hex("#2ECC77")
+                            color: 1, 1, 1, 1
+                            font_size: '12sp'
+                    
+                    # Graph container
+                    BoxLayout:
+                        size_hint_y: 1
+                        padding: [dp(5), dp(5), dp(15), dp(15)]  # Add padding for axes
                     
                     Graph:
                         id: trend_graph
