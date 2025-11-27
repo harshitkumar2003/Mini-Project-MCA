@@ -1,5 +1,37 @@
-#:kivy 2.0.0
-
+# Custom Role Card Definition
+<RoleCard@ButtonBehavior+BoxLayout>:
+    role_name: 'Role'
+    role_icon: 'assets/user-icon.png' # Placeholder icon
+    orientation: 'vertical'
+    spacing: 10
+    padding: 15
+    size_hint_y: None
+    height: 150
+    # Card Styling (Clickable Button Behavior)
+    canvas.before:
+        Color:
+            # Change color slightly on press for feedback
+            rgba: 0.85, 0.95, 0.9, 1 if self.state == 'normal' else 0.7, 0.85, 0.75, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [15]
+    
+    Image:
+        source: root.role_icon
+        size_hint: None, None
+        size: [60, 60]
+        pos_hint: {'center_x': 0.5}
+        allow_stretch: True
+        
+    Label:
+        text: root.role_name
+        font_size: '18sp'
+        color: 0.2, 0.2, 0.2, 1
+        bold: True
+        size_hint_y: None
+        height: self.texture_size[1]
+        
 <LandingScreen>:
     name: 'landing'
     
@@ -10,8 +42,8 @@
         
         # Header
         BoxLayout:
-            size_hint_y: 0.12
-            padding: [20, 10]
+            size_hint_y: 0.11
+            padding: [20, 5]
             canvas.before:
                 Color:
                     rgba: 0.2, 0.6, 0.4, 1
@@ -20,26 +52,28 @@
                     size: self.size
             
             Image:
-                source: 'assets/logo.png'
-                size_hint: None, 1
+                source: 'assets/logo2.png'
+                size_hint_x: 0.11
                 width: self.height
                 allow_stretch: True
+                keep_ratio: True
                 
             Label:
-                text: 'TrackHealth'
+                text: 'Home'
                 font_size: '24sp'
                 color: 1, 1, 1, 1
                 bold: True
                 size_hint_x: 0.7
                 
             Button:
-                text: 'Login'
+                text: 'Help'
                 size_hint: None, None
                 size: [100, 40]
                 pos_hint: {'right': 0.95, 'center_y': 0.5}
-                background_color: 1, 1, 1, 0.2
-                color: 1, 1, 1, 1
-                on_release: app.root.current = 'login'
+                background_normal: ''
+                background_color: 1,1,1,1
+                color: 0.1, 0.4, 0.2, 1
+                on_release: app.root.current = 'help'
         
         # Main Content
         ScrollView:
@@ -56,7 +90,7 @@
                 BoxLayout:
                     orientation: 'vertical'
                     size_hint_y: None
-                    height: 300
+                    height: 280
                     canvas.before:
                         Color:
                             rgba: 0.9, 0.96, 0.9, 1
@@ -77,20 +111,68 @@
                         text_size: self.width, None
                         halign: 'center'
                         valign: 'middle'
-                        size_hint_y: 0.3
+                        size_hint_y: 0.2
                         color: 0.3, 0.3, 0.3, 1
                         
-                    Button:
-                        text: 'Get Started'
-                        size_hint: None, None
-                        size: [200, 50]
-                        pos_hint: {'center_x': 0.5}
-                        background_color: 0.2, 0.6, 0.4, 1
-                        color: 1, 1, 1, 1
-                        font_size: '18sp'
-                        on_release: app.root.current = 'login'
+                # ----------------------------------------
+                # --- NEW ROLE SELECTION SECTION ---
+                # ----------------------------------------
+                Label:
+                    text: 'Select Your Role to Continue'
+                    font_size: '24sp'
+                    color: 0.2, 0.2, 0.2, 1
+                    bold: True
+                    size_hint_y: None
+                    height: 50
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: 380
+                    spacing: 10
+                    padding: [20, 20]
+                    canvas.before:
+                        Color:
+                            rgba: 0.2, 0.6, 0.4, 0.1
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [15]
                 
-                # Features Section
+                    GridLayout:
+                        cols: 2
+                        spacing: 15
+                        size_hint_y: None
+                        height: self.minimum_height
+                    
+                        # Role Card 1: User
+                        RoleCard:
+                            role_name: 'User'
+                            role_icon: 'assets/user-icon.png' 
+                            on_release: root.select_role('user')
+
+                        # Role Card 2: Patient
+                        RoleCard:
+                            role_name: 'Patient'
+                            role_icon: 'assets/patient-icon.png' 
+                            on_release: root.select_role('patient')
+
+                        # Role Card 3: Doctor
+                        RoleCard:
+                            role_name: 'Doctor'
+                            role_icon: 'assets/doctor-icon.png'
+                            on_release: root.select_role('doctor')
+
+                        # Role Card 4: Admin
+                        RoleCard:
+                            role_name: 'Admin'
+                            role_icon: 'assets/admin-icon.png'
+                            on_release: root.select_role('admin')
+                
+                # ----------------------------------------
+                # Features Section (Original Content continues below)
+                # ----------------------------------------
+                
                 Label:
                     text: 'Key Features'
                     font_size: '24sp'
@@ -98,7 +180,7 @@
                     bold: True
                     size_hint_y: None
                     height: 50
-                
+                    
                 # Feature Cards
                 GridLayout:
                     cols: 1
@@ -125,7 +207,7 @@
                                 size_hint: None, 1
                                 width: self.height
                             Label:
-                                text: 'Symptom Tracker\nMonitor your health with our easy-to-use symptom tracker'
+                                text: 'Symptom Tracker \nMonitor your health with our easy-to-use symptom tracker'
                                 color: 0.2, 0.2, 0.2, 1
                                 text_size: self.width, None
                                 valign: 'middle'
@@ -149,11 +231,11 @@
                                 size_hint: None, 1
                                 width: self.height
                             Label:
-                                text: 'Doctor Connect\nConsult with certified healthcare professionals'
+                                text: 'Doctor Connect \nConsult with certified healthcare professionals'
                                 color: 0.2, 0.2, 0.2, 1
                                 text_size: self.width, None
                                 valign: 'middle'
-                
+                                
                 # Trending Now Section
                 BoxLayout:
                     orientation: 'vertical'
@@ -167,7 +249,7 @@
                         color: 0.2, 0.2, 0.2, 1
                         bold: True
                         size_hint_y: 0.3
-                    
+                        
                     ScrollView:
                         size_hint_y: 0.7
                         do_scroll_x: True
@@ -201,7 +283,7 @@
                                     font_size: '12sp'
                                     color: 0.2, 0.6, 0.4, 1
                                     bold: True
-                            
+                                    
                             # Trending Item 2
                             BoxLayout:
                                 orientation: 'vertical'
@@ -223,7 +305,7 @@
                                     font_size: '12sp'
                                     color: 0.2, 0.6, 0.4, 1
                                     bold: True
-                            
+                                    
                             # Trending Item 3
                             BoxLayout:
                                 orientation: 'vertical'
@@ -245,37 +327,6 @@
                                     font_size: '12sp'
                                     color: 0.2, 0.6, 0.4, 1
                                     bold: True
-                
-                # Call to Action
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_y: None
-                    height: 200
-                    padding: [30, 20]
-                    canvas.before:
-                        Color:
-                            rgba: 0.2, 0.6, 0.4, 0.1
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [15]
-                    
-                    Label:
-                        text: 'Ready to take control of your health?'
-                        font_size: '22sp'
-                        color: 0.2, 0.2, 0.2, 1
-                        bold: True
-                        size_hint_y: 0.5
-                    
-                    Button:
-                        text: 'Sign Up Now'
-                        size_hint: None, None
-                        size: [200, 50]
-                        pos_hint: {'center_x': 0.5}
-                        background_color: 0.2, 0.6, 0.4, 1
-                        color: 1, 1, 1, 1
-                        font_size: '18sp'
-                        on_release: app.root.current = 'login'
         
         # Footer
         BoxLayout:
