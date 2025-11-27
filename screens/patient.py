@@ -12,7 +12,7 @@ from kivy.utils import get_color_from_hex
 from kivy.core.window import Window
 
 # Set a standard size for testing on PC, remove this for mobile
-Window.size = (400, 750)
+#Window.size = (400, 750)
 
 # --- Import Kivy Garden Graph ---
 try:

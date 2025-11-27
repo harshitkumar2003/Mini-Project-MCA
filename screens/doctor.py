@@ -13,7 +13,7 @@ from kivy.metrics import dp
 import os
 
 # Set a standard size for testing on PC, remove this for mobile
-Window.size = (400, 750)
+#Window.size = (400, 750)
 
 # --- Import Graph Components ---
 try:
