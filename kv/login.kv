@@ -8,7 +8,7 @@
                 pos: self.pos
                 size: self.size
             Color:
-                rgba: 1, 1, 1, 1  # If you want a slight overlay, adjust alpha to e.g. 0.92
+                rgba: 1, 1, 1, 1 
             # The illustration placed bottom left, covering ~45% width, ~60% height
             Rectangle:
                 source: "assets/ill-1.png"
@@ -18,9 +18,9 @@
         BoxLayout:
             id: card_box
             orientation: 'vertical'
-            size_hint: 0.4, 1.4  # Takes 50% of parent width and 50% of parent height
+            size_hint: 0.4, 1.4 # Takes 50% of parent width and 50% of parent height
             pos_hint: {"center_x": 0.64, "center_y": 0.33}
-            padding: [24, 32, 24, 24]  # More top padding for floating effect
+            padding: [24, 32, 24, 24] # More top padding for floating effect
             spacing: 16
 
             BoxLayout:
@@ -31,13 +31,15 @@
                     text: "home"
                     size_hint_x: None
                     width: 100
+                    background_normal: ""
                     background_color: 0.2, 0.6, 0.4, 1
                     color: 1, 1, 1, 1
                     font_size: "16sp"
                     on_release:
+                        root.reset_fields()
                         app.root.current = "landing"
 
-            # (The rest of your existing content - keep unchanged)
+            # (Logo - kept the same)
             Image:
                 source: "assets/logo2.png"
                 size_hint_y: None
@@ -54,7 +56,9 @@
                 id: login_views
                 size_hint_y: 1
 
-                # Login View
+                # -----------------------------------------------------
+                # 1. Login View (User ID / Employee ID login)
+                # -----------------------------------------------------
                 Screen:
                     name: "login_view"
                     ScrollView:
@@ -67,9 +71,10 @@
                             spacing: 18
                             padding: [0, 0]
 
-                            AadhaarInput:
-                                id: adhar_input
-                                hint_text: "Aadhar No."
+                            # 🌟 CHANGE 1: User ID Input (Replaces Aadhaar Input)
+                            TextInput:
+                                id: user_id_input # <--- UPDATED ID
+                                hint_text: "Enter User ID / Employee ID" # <--- UPDATED HINT
                                 size_hint_y: None
                                 height: 50
                                 background_normal: ""
@@ -94,16 +99,7 @@
                                 multiline: False
                                 padding: [20, (self.height - self.line_height) / 2]
 
-                            Spinner:
-                                id: role_spinner
-                                text: "Select Role"
-                                values: ["User","Admin", "Doctor", "Patient"]
-                                size_hint_y: None
-                                height: 48
-                                background_normal: ""
-                                background_color: 0.2, 0.6, 0.4, 1
-                                color: 1, 1, 1, 1
-                                font_size: 18
+                            # ❌ REMOVED: role_spinner widget
 
                             Button:
                                 text: "Log In"
@@ -137,6 +133,8 @@
 
                                 Button:
                                     text: "Don't have an account Sign Up"
+                                    # This button is generally visible, but clicking it only works
+                                    # if the selected role is 'user' (handled in Python logic).
                                     size_hint_y: None
                                     height: dp(20)
                                     text_size: self.size
@@ -148,7 +146,9 @@
                                     font_size: 17
                                     on_release: root.screen_switch("signup_view")
 
-                # Signup View
+                # -----------------------------------------------------
+                # 2. Signup View (Only for User role)
+                # -----------------------------------------------------
                 Screen:
                     name: "signup_view"
                     ScrollView:
@@ -160,6 +160,14 @@
                             height: self.minimum_height
                             spacing: 15
                             padding: [0, 0]
+                            
+                            Label:
+                                text: "User Registration"
+                                size_hint_y: None
+                                height: 30
+                                font_size: 20
+                                bold: True
+                                color: 0.2, 0.2, 0.2, 1
 
                             TextInput:
                                 id: name_input
@@ -187,9 +195,10 @@
                                 multiline: False
                                 padding: [20, (self.height - self.line_height) / 2]
 
+                            # AadhaarInput remains for User signup
                             AadhaarInput:
                                 id: signup_adhar_input
-                                hint_text: "Aadhar No."
+                                hint_text: "Aadhaar No. (Mandatory)"
                                 size_hint_y: None
                                 height: 50
                                 background_normal: ""
@@ -200,9 +209,11 @@
                                 multiline: False
                                 padding: [20, (self.height - self.line_height) / 2]
 
+                            # Phone Input (for OTP reset)
                             TextInput:
                                 id: phone_input
-                                hint_text: "Phone number"
+                                hint_text: "Phone number (Used for OTP)"
+                                input_filter: "int"
                                 size_hint_y: None
                                 height: 50
                                 background_normal: ""
@@ -227,16 +238,7 @@
                                 multiline: False
                                 padding: [20, (self.height - self.line_height) / 2]
 
-                            Spinner:
-                                id: signup_role_spinner
-                                text: "Signin as"
-                                values: ["User"]
-                                size_hint_y: None
-                                height: 48
-                                background_normal: ""
-                                background_color: 0.2, 0.6, 0.4, 1
-                                color: 1, 1, 1, 1
-                                font_size: 18
+                            # ❌ REMOVED: signup_role_spinner widget
 
                             Button:
                                 text: "Sign Up"
@@ -259,7 +261,9 @@
                                 font_size: 18
                                 on_release: root.screen_switch("login_view")
 
-                # Forgot Password View
+                # -----------------------------------------------------
+                # 3. Forgot Password View (OTP Request via Phone)
+                # -----------------------------------------------------
                 Screen:
                     name: "forgot_view"
                     ScrollView:
@@ -271,10 +275,20 @@
                             height: self.minimum_height
                             spacing: 15
                             padding: [0, 0]
+                            
+                            Label:
+                                text: "Verify Phone for OTP"
+                                size_hint_y: None
+                                height: 30
+                                font_size: 20
+                                bold: True
+                                color: 0.2, 0.2, 0.2, 1
 
-                            AadhaarInput:
-                                id: forgot_adhar_input
-                                hint_text: "Enter Aadhar"
+                            # 🌟 CHANGE 2: Phone Number Input (Replaces forgot_adhar_input)
+                            TextInput:
+                                id: forgot_phone_input # <--- UPDATED ID
+                                hint_text: "Enter Registered Phone Number"
+                                input_filter: "int"
                                 size_hint_y: None
                                 height: 50
                                 background_normal: ""
@@ -367,7 +381,7 @@
                                 size_hint_y: None
                                 height: 50
                                 background_normal: ""
-                                background_color: 0.12, 0.29, 0.61, 1
+                                background_color: 0.2, 0.6, 0.4, 1
                                 color: 1, 1, 1, 1
                                 font_size: 18
                                 bold: True
@@ -383,7 +397,9 @@
                                 font_size: 17
                                 on_release: root.screen_switch("login_view")
 
-                # Reset Password View
+                # -----------------------------------------------------
+                # 4. Reset Password View
+                # -----------------------------------------------------
                 Screen:
                     name: "reset_password_view"
                     ScrollView:
