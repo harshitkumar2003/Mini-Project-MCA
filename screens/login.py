@@ -61,17 +61,27 @@ class LoginSignupScreen(Screen):
 
 
     def load_last_user_id(self):
-        # Database se pichla bada user ID load karein
         conn = sqlite3.connect("users.db")
         cursor = conn.cursor()
+        # Find the latest generated user ID
         cursor.execute("SELECT user_id FROM users WHERE role='User' ORDER BY user_id DESC LIMIT 1")
         result = cursor.fetchone()
         conn.close()
         
-        if result:
-            self.last_user_id = result[0].split('-')[-1] # Assuming ID is like 'UPTH1501'
+        if result and result[0]:
+            full_id = result[0]
+            if '-' in full_id:
+                # Assuming format is 'UPTH-000001'. Split and take the last part.
+                numeric_part = full_id.split('-')[-1]
+            else:
+                # Assuming format is 'UPTH1500'. Remove all non-digits.
+                numeric_part = ''.join(filter(str.isdigit, full_id))
+            
+            # Store the parsed numerical part (e.g., '000001' or '1500')
+            self.last_user_id = numeric_part if numeric_part.isdigit() else '15000'
         else:
-            self.last_user_id = 'UPTH1500' # Starting point if no users exist
+            self.last_user_id = '15000' # No users yet, start from 0 
+
 
     def create_users_table(self):
         conn = sqlite3.connect("users.db")
@@ -92,10 +102,20 @@ class LoginSignupScreen(Screen):
         conn.close()
 
     def generate_user_id(self):
-        #! Generates a new sequential User ID (e.g., UPTH-001501).
-        current_num = int(self.last_user_id) + 1
-        new_id = f"UPTH-{current_num:06d}"
-        self.last_user_id = f"{current_num:06d}"
+        """Generates a new sequential User ID (e.g., UPTH-000001)."""
+        
+        # Safely convert to integer. If conversion fails, start from 0.
+        try:
+            current_num = int(self.last_user_id)
+        except ValueError:
+            current_num = 0
+            
+        current_num += 1
+        
+        prefix = "UPTH" 
+        new_id = f"{prefix}-{current_num:06d}"
+        
+        self.last_user_id = f"{current_num:06d}" # Store only the number for the next run
         return new_id
     
     #! otp ko auto move krne k liye next box me focus hojaye
@@ -113,19 +133,36 @@ class LoginSignupScreen(Screen):
                 pass
 
     def on_enter(self):
-        # Clear fields on enter
+    # Clear fields on enter
         self.reset_fields()
         role = self.selected_role.lower()
-        
-        # User screen: show Signup view, hide Login ID input for signup
-        if role == 'user':
-            self.ids.login_views.current = 'signup_view' # Redirect to Signup for User
-            # self.ids.signup_adhar_input.disabled = False # Assuming KV handles this visibility
-        
-        # Doctor/Admin/Patient screens: show Login view
+    
+        # 1. First, handle non-User roles (Doctor/Patient/Admin) - always show Login
+        if role != 'user':
+            self.ids.login_views.current = 'login_view'
+            return
+    
+        # 2. Handle 'User' role dynamically: Check if any user exists
+    
+        user_exists = False
+        conn = sqlite3.connect("users.db")
+        cursor = conn.cursor()
+    
+        # Check if any user with role 'User' exists in the database
+        cursor.execute("SELECT COUNT(*) FROM users WHERE role='User'")
+        count = cursor.fetchone()[0]
+        conn.close()
+    
+        if count > 0:
+            user_exists = True
+    
+        # 3. Redirect based on existence
+        if user_exists:
+            # User already exists, show Login page by default
+            self.ids.login_views.current = 'login_view'
         else:
-            self.ids.login_views.current = 'login_view' # Default to Login
-            # self.ids.signup_adhar_input.disabled = True # Assuming KV handles this visibility
+            # First time, no users exist, force Signup
+            self.ids.login_views.current = 'signup_view'
 
     #! validate  krega login credentials and redirect based on role
     def validate_login(self):
