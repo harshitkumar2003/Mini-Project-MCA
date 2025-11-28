@@ -6,32 +6,45 @@ from kivy.uix.label import Label
 from kivy.properties import StringProperty
 from kivy.uix.textinput import TextInput
 
-#!adhar input ki functionality for formatting with dashes 
+# ==============================================================================
+#! Custom TextInput for Aadhaar Formatting 
+# ==============================================================================
 class AadhaarInput(TextInput):
     def insert_text(self, substring, from_undo=False):
-        # Only digits allowed, combine existing and new input
         s = ''.join(filter(str.isdigit, self.text + substring))
-
-        # Restrict max 12 digits
         if len(s) > 12:
             s = s[:12]
-
-        # Insert dash after every 4 digits
         groups = [s[i:i+4] for i in range(0, len(s), 4)]
         s = '-'.join(groups)
-
-        # Update text and cursor position
         self.text = s
         self.cursor = (len(self.text), 0)
 
 #! login and signup screen with OTP and password reset
 class LoginSignupScreen(Screen):
     temp_otp = StringProperty('')
-    current_reset_adhar = ''  # Track Aadhaar for resetting password
+    current_reset_phone = ''  # Track phone for resetting password
+    #! NEW PROPERTY: Landing page se select kiya gaya role store karega
+    selected_role = StringProperty('') # Default empty string
+    #! NEW: User ID counter for auto-generation
+    last_user_id = StringProperty('UPTH1500')
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.create_users_table()
+        self.load_last_user_id()
+
+    def load_last_user_id(self):
+        # Database se pichla bada user ID load karein
+        conn = sqlite3.connect("users.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM users WHERE role='User' ORDER BY user_id DESC LIMIT 1")
+        result = cursor.fetchone()
+        conn.close()
+        
+        if result:
+            self.last_user_id = result[0].split('-')[-1] # Assuming ID is like 'UPTH1501'
+        else:
+            self.last_user_id = 'UPTH1500' # Starting point if no users exist
 
     def create_users_table(self):
         conn = sqlite3.connect("users.db")
@@ -41,7 +54,8 @@ class LoginSignupScreen(Screen):
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT,
                 email TEXT,
-                aadhaar TEXT UNIQUE,
+                user_id TEXT UNIQUE,
+                aadhaar TEXT,
                 phone TEXT,
                 password TEXT,
                 role TEXT
@@ -49,15 +63,21 @@ class LoginSignupScreen(Screen):
         """)
         conn.commit()
         conn.close()
-   
+
+    def generate_user_id(self):
+        #! Generates a new sequential User ID (e.g., UPTH-001501).
+        current_num = int(self.last_user_id) + 1
+        new_id = f"UPTH-{current_num:06d}"
+        self.last_user_id = f"{current_num:06d}"
+        return new_id
+    
     #! otp ko auto move krne k liye next box me focus hojaye
     def on_otp_text(self, instance, value):
         if len(value) > 1:
             instance.text = value[:1]
-
         if len(instance.text) == 1:
             try:
-                current_id = instance.id  # e.g., otp1
+                current_id = instance.id 
                 next_index = int(current_id[-1]) + 1
                 next_id = f'otp{next_index}'
                 if next_id in self.ids:
@@ -65,35 +85,59 @@ class LoginSignupScreen(Screen):
             except Exception:
                 pass
 
+    def on_enter(self):
+        # Clear fields on enter
+        self.reset_fields()
+        role = self.selected_role.lower()
+        
+        # User screen: show Signup view, hide Login ID input for signup
+        if role == 'user':
+            self.ids.login_views.current = 'signup_view' # Redirect to Signup for User
+            # self.ids.signup_adhar_input.disabled = False # Assuming KV handles this visibility
+        
+        # Doctor/Admin/Patient screens: show Login view
+        else:
+            self.ids.login_views.current = 'login_view' # Default to Login
+            # self.ids.signup_adhar_input.disabled = True # Assuming KV handles this visibility
+
     #! validate  krega login credentials and redirect based on role
     def validate_login(self):
-        adhar = self.ids.adhar_input.text.strip().replace("-", "").replace(" ", "")
+        role = self.selected_role.lower()
         password = self.ids.password_input.text.strip()
-        role = self.ids.role_spinner.text.strip()
 
-         #todo --- Developer Admin Login (Direct Access without DB) ---
-        if adhar == "200000000003" and password == "admin2003" and role.lower() == "admin":
+        # 🌟 CHANGE 1: Login ID Field based on role
+        if role == 'user':
+            login_id = self.ids.user_id_input.text.strip() # User login by User ID
+            lookup_field = "user_id"
+        else:
+            # For Doctor/Patient/Admin, assuming they also login with a fixed User ID field (no Aadhaar)
+            login_id = self.ids.user_id_input.text.strip()
+            lookup_field = "user_id"
+
+        #! --- Developer Admin Login (Direct Access without DB) ---
+        if login_id == "UPTHAD00" and password == "admin2003" and role == "admin":
             self.manager.current = "admin"
             return
 
-        if not adhar or not password or role not in ['User', 'Admin', 'Doctor', 'Patient']:
-            self.show_popup("Error", "Please fill all details and select a valid role.")
+        if not login_id or not password or role not in ['user', 'admin', 'doctor', 'patient']:
+            self.show_popup("Error", "Please fill all details.")
             return
 
         conn = sqlite3.connect("users.db")
         cursor = conn.cursor()
 
-        cursor.execute("SELECT password, role FROM users WHERE aadhaar=?", (adhar,))
+        # 🌟 CHANGE 2: Look up by user_id instead of aadhaar
+        cursor.execute(f"SELECT password, role FROM users WHERE {lookup_field}=?", (login_id,))
         result = cursor.fetchone()
 
         if result is None:
-            self.show_popup("Error", "User not found.")
+            # 🌟 CHANGE 3: Changed error message
+            self.show_popup("Error", f"{role.capitalize()} ID not found.")
         else:
             stored_password, stored_role = result
 
             if stored_password == password:
-
-                if stored_role.lower() != role.lower():
+                if stored_role.lower() != role:
                     self.show_popup("Error", "You do not have permission for this role.")
                     conn.close()
                     return
@@ -108,62 +152,76 @@ class LoginSignupScreen(Screen):
                     self.manager.current = 'admin'
                 elif r == 'user':
                     self.manager.current = 'dashboard'
-                else:
-                    self.show_popup("Error", "Invalid role assigned to user.")
             else:
                 self.show_popup("Error", "Incorrect password.")
-
+        
         conn.close()
 
     #! validate krega signup details and store in database
     def validate_signup(self):
+        role = self.selected_role.lower()
+        if role != 'user':
+            self.show_popup("Error", "Signup is only available for User role.")
+            return
+
         name = self.ids.name_input.text.strip()
         email = self.ids.email_input.text.strip()
         adhar = self.ids.signup_adhar_input.text.strip().replace("-", "").replace(" ", "")
         phone = self.ids.phone_input.text.strip()
         password = self.ids.signup_password_input.text.strip()
-        role = self.ids.signup_role_spinner.text.strip()
 
-        if not (name and email and adhar and phone and password and role in ["User"]):
-            self.show_popup("Error", "All fields are required, and a valid role must be selected.")
+        if not (name and email and adhar and phone and password):
+            self.show_popup("Error", "All fields are required.")
             return
+        
+        new_user_id = self.generate_user_id() # NEW: Auto-generate User ID
 
         try:
             conn = sqlite3.connect("users.db")
             cursor = conn.cursor()
+            
+            # 🌟 CHANGE 4: Insert user_id and keep aadhaar
             cursor.execute("""
-                INSERT INTO users (name, email, aadhaar, phone, password, role)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (name, email, adhar, phone, password, role))
+                INSERT INTO users (name, email, aadhaar, phone, password, role, user_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (name, email, adhar, phone, password, role.capitalize(), new_user_id))
+            
             conn.commit()
             conn.close()
-            self.show_popup("Success", "Signup successful! Please login.")
+            self.show_popup("Success", f"Signup successful! Your User ID is {new_user_id}. Please login.")
             self.screen_switch('login_view')
-        except sqlite3.IntegrityError:
-            self.show_popup("Error", "Aadhaar already registered.")
+            self.ids.user_id_input.text = new_user_id # Pre-fill login ID
+        except sqlite3.IntegrityError as e:
+            if "aadhaar" in str(e):
+                self.show_popup("Error", "Aadhaar already registered.")
+            elif "phone" in str(e):
+                self.show_popup("Error", "Phone number already registered.")
+            else:
+                self.show_popup("Error", "Signup failed due to duplicate entry.")
         except Exception as e:
             self.show_popup("Error", f"Signup failed: {e}")
 
     #! OTP generation and verification for password reset krna
     def send_otp(self):
-        adhar = self.ids.forgot_adhar_input.text.strip().replace("-", "").replace(" ", "")
-        if not adhar:
-            self.show_popup("Error", "Please enter Aadhaar number.")
+        phone = self.ids.forgot_phone_input.text.strip() # Using phone number for OTP
+        if not phone or len(phone) != 10 or not phone.isdigit():
+            self.show_popup("Error", "Please enter a valid 10-digit phone number.")
             return
 
-        #! Check if Aadhaar exists in database before sending OTP
+        #! Check if Phone exists in database before sending OTP
         conn = sqlite3.connect("users.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE aadhaar=?", (adhar,))
+        cursor.execute("SELECT * FROM users WHERE phone=?", (phone,))
         user = cursor.fetchone()
         conn.close()
 
         if not user:
-            self.show_popup("Error", "Aadhaar not found. Please check and try again.")
+            self.show_popup("Error", "Phone number not found.")
             return
 
         self.temp_otp = str(random.randint(1000, 9999))
         self.ids.otp_notice.text = f"(Test OTP: {self.temp_otp})"
+        self.current_reset_phone = phone # Store phone number for reset
         self.show_popup("OTP Generated", "Check OTP displayed below and enter to verify.")
 
     #! OTP verification
@@ -171,7 +229,6 @@ class LoginSignupScreen(Screen):
         entered_otp = ''.join([self.ids[f'otp{i}'].text for i in range(1, 5)])
         if entered_otp == self.temp_otp:
             self.show_popup("Success", "OTP verified. Please reset your password.")
-            self.current_reset_adhar = self.ids.forgot_adhar_input.text.strip().replace("-", "").replace(" ", "")
             self.screen_switch("reset_password_view")
         else:
             self.show_popup("Error", "Incorrect OTP.")
@@ -180,6 +237,7 @@ class LoginSignupScreen(Screen):
     def reset_password(self):
         new_password = self.ids.new_password_input.text.strip()
         confirm_password = self.ids.confirm_password_input.text.strip()
+        phone_to_reset = self.current_reset_phone # Use stored phone number
 
         if not new_password or not confirm_password:
             self.show_popup("Error", "Please fill all password fields.")
@@ -192,12 +250,13 @@ class LoginSignupScreen(Screen):
         try:
             conn = sqlite3.connect("users.db")
             cursor = conn.cursor()
-            cursor.execute("UPDATE users SET password=? WHERE aadhaar=?", (new_password, self.current_reset_adhar))
+            # Update password based on phone number
+            cursor.execute("UPDATE users SET password=? WHERE phone=?", (new_password, phone_to_reset))
             conn.commit()
             conn.close()
             self.show_popup("Success", "Password reset successfully. Please login.")
             self.screen_switch("login_view")
-            #! Clear password fields after reset
+            
             self.ids.new_password_input.text = ""
             self.ids.confirm_password_input.text = ""
         except Exception as e:
@@ -206,15 +265,29 @@ class LoginSignupScreen(Screen):
 #! screen switching between login, signup, otp, reset views
     def screen_switch(self, target):
         self.ids.login_views.current = target
-        # Optionally clear inputs when switching screens here
 
     def show_popup(self, title, message):
         Popup(title=title, content=Label(text=message),
               size_hint=(0.6, 0.4)).open()
     
     def reset_fields(self):
-        self.ids.adhar_input.text = ""
+        # Clear fields for Login view
+        self.ids.user_id_input.text = ""
         self.ids.password_input.text = ""
-        self.ids.role_spinner.text = "Select Role"  # or default value
-        # Reset other fields if required
+        
+        # Clear fields for Signup view
+        self.ids.name_input.text = ""
+        self.ids.email_input.text = ""
+        self.ids.signup_adhar_input.text = ""
+        self.ids.phone_input.text = ""
+        self.ids.signup_password_input.text = ""
+        
+        # Clear fields for Forgot Password
+        self.ids.forgot_phone_input.text = ""
+        self.ids.otp_notice.text = ""
+        for i in range(1, 5):
+            self.ids[f'otp{i}'].text = ""
+        self.ids.new_password_input.text = ""
+        self.ids.confirm_password_input.text = ""
+        self.current_reset_phone = ""
     
