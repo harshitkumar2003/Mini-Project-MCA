@@ -28,10 +28,37 @@ class LoginSignupScreen(Screen):
     #! NEW: User ID counter for auto-generation
     last_user_id = StringProperty('UPTH1500')
 
+    #temporary fix k liye jo purana database hai usme schema update krdega
+    def update_users_table_schema(self):
+        """Adds the missing user_id column to the existing table."""
+        conn = sqlite3.connect("users.db")
+        cursor = conn.cursor()
+        try:
+            # FIX: Temporarily remove 'UNIQUE' constraint during migration.
+            # We will rely on Python/future inserts to enforce uniqueness for now.
+            cursor.execute("ALTER TABLE users ADD COLUMN user_id TEXT") 
+            
+            # 🌟 IMPORTANT: After adding the column, update existing rows to be non-NULL
+            # This is crucial if you later want to fully restore the UNIQUE constraint.
+            cursor.execute("UPDATE users SET user_id = 'TEMP_MIG_' || id WHERE user_id IS NULL")
+            
+            conn.commit()
+            print("Database migration successful: Added 'user_id' column without UNIQUE.")
+        except sqlite3.OperationalError as e:
+            if "duplicate column name: user_id" in str(e):
+                print("Column user_id already exists (migration skipped).")
+            else:
+                raise e 
+        finally:
+            conn.close()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.create_users_table()
+        # 🌟 TEMPORARY FIX: Call this once to update your old database file
+        self.update_users_table_schema()
         self.load_last_user_id()
+
 
     def load_last_user_id(self):
         # Database se pichla bada user ID load karein
