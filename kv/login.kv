@@ -18,8 +18,8 @@
         BoxLayout:
             id: card_box
             orientation: 'vertical'
-            size_hint: 0.4, 1.4 # Takes 50% of parent width and 50% of parent height
-            pos_hint: {"center_x": 0.64, "center_y": 0.33}
+            size_hint: 0.5, 1.4 # Takes 50% of parent width and 50% of parent height
+            pos_hint: {"center_x": 0.64, "center_y": 0.4}
             padding: [24, 32, 24, 24] # More top padding for floating effect
             spacing: 16
 
@@ -52,7 +52,7 @@
                     name: "login_view"
                     ScrollView:
                         do_scroll_x: False
-                        do_scroll_y: False
+                        do_scroll_y: True
                         BoxLayout:
                             orientation: 'vertical'
                             size_hint_y: None
@@ -60,7 +60,6 @@
                             spacing: 18
                             padding: [0, 0]
 
-                            # 🌟 CHANGE 1: User ID Input (Replaces Aadhaar Input)
                             TextInput:
                                 id: user_id_input # <--- UPDATED ID
                                 hint_text: "Enter User ID / Employee ID" # <--- UPDATED HINT
@@ -142,7 +141,7 @@
                     name: "signup_view"
                     ScrollView:
                         do_scroll_x: False
-                        do_scroll_y: False
+                        do_scroll_y: True
                         BoxLayout:
                             orientation: 'vertical'
                             size_hint_y: None

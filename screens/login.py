@@ -56,7 +56,7 @@ class LoginSignupScreen(Screen):
         super().__init__(**kwargs)
         self.create_users_table()
         # 🌟 TEMPORARY FIX: Call this once to update your old database file
-        self.update_users_table_schema()
+        #self.update_users_table_schema()
         self.load_last_user_id()
 
 
