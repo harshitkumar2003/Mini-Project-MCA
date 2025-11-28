@@ -1,337 +1,425 @@
 #:import get_color_from_hex kivy.utils.get_color_from_hex
-#:import Graph kivy_garden.graph.Graph
 
-# --- Custom Styles ---
+# --- GLOBAL STYLES ---
 <Label>:
-    color: get_color_from_hex("#000000")
+    color: get_color_from_hex("#292b2aff")
 
-<BoldLabel@Label>:
-    bold: True
-
-<ActivityItem@BoxLayout>:
-    icon: ''
-    text: ''
-    orientation: 'horizontal'
-    size_hint_y: None
-    height: dp(40)
-    spacing: dp(10)
-    Image:
-        source: root.icon if root.icon else ''
-        size_hint_x: None
-        width: dp(30)
-        allow_stretch: True
-    Label:
-        text: root.text
-        halign: 'left'
-        text_size: self.size
-        valign: 'middle'
-        color: 0.3, 0.3, 0.3, 1
-
-<VitalBox>:
-    orientation: 'vertical'
-    padding: dp(10)
+<RoundedBoxLayout>:
     canvas.before:
         Color:
-            rgba: root.box_color
+            rgba: self.background_color
         RoundedRectangle:
             pos: self.pos
             size: self.size
-            radius: [dp(10)]
+            radius: self.radius
+
+
+# --- NEW: PATIENT HEADER ---
+<PatientHeader>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: dp(160)
+    padding: dp(20)
+    spacing: dp(10)
+    background_color: get_color_from_hex("#2ECC71")
+    
+    BoxLayout:
+        size_hint_y: None
+        height: dp(30)
+        spacing: dp(10)
+        Label:
+            text: "👤"
+            size_hint_x: None
+            width: dp(30)
+            font_size: '24sp'
+        Label:
+            text: root.patient_name
+            font_size: '20sp'
+            bold: True
+            halign: 'left'
+            valign: 'middle'
+            text_size: self.size
+            color: get_color_from_hex("#2C3E50")
+
+    BoxLayout:
+        size_hint_y: None
+        height: dp(1)
+        canvas:
+            Color:
+                rgba: 0.9, 0.9, 0.9, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+    GridLayout:
+        cols: 2
+        spacing: dp(5)
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: "Gender: " + root.gender
+                halign: 'left'
+                text_size: self.size
+                font_size: '13sp'
+                color: get_color_from_hex("#555555")
+            Label:
+                text: "Room: " + root.room_no
+                halign: 'left'
+                text_size: self.size
+                font_size: '13sp'
+                color: get_color_from_hex("#555555")
+            Label:
+                text: "Aadhar: " + root.aadhar
+                halign: 'left'
+                text_size: self.size
+                font_size: '12sp'
+                color: get_color_from_hex("#888888")
+
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: "Blood: " + root.blood_group
+                halign: 'left'
+                text_size: self.size
+                font_size: '13sp'
+                color: get_color_from_hex("#E74C3C")
+                bold: True
+            Label:
+                text: "Ph: " + root.phone
+                halign: 'left'
+                text_size: self.size
+                font_size: '13sp'
+                color: get_color_from_hex("#555555")
+            Label:
+                text: "ID: #99281"
+                halign: 'left'
+                text_size: self.size
+                font_size: '12sp'
+                color: get_color_from_hex("#888888")
+
+
+# --- ALERT CARD ---
+<AlertCard>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: dp(90)
+    radius: [dp(15)]
+    background_color: get_color_from_hex("#E74C3C")
+    padding: dp(15)
+    spacing: dp(5)
+
+    BoxLayout:
+        size_hint_y: None
+        height: dp(20)
+        spacing: dp(10)
+        Label:
+            text: "🔔"
+            font_size: '16sp'
+            size_hint_x: None
+            width: dp(20)
+        Label:
+            text: "Urgent Alerts"
+            font_size: '16sp'
+            bold: True
+            color: 1, 1, 1, 1
+            halign: 'left'
+            text_size: self.size
+
     Label:
-        text: root.title
-        font_size: '16sp'
-        bold: True
-        color: 1, 1, 1, 1
-        size_hint_y: 0.3
-    Label:
-        text: root.value
-        font_size: '24sp'
-        bold: True
-        color: 1, 1, 1, 1
-        size_hint_y: 0.5
-    Label:
-        text: root.unit
+        text: "CRITICAL: Patient requires immediate attention regarding SpO2 levels."
         font_size: '12sp'
         color: 1, 1, 1, 1
-        size_hint_y: 0.2
+        text_size: self.size
+        halign: 'left'
+        valign: 'top'
 
-# --- Main Dashboard Layout ---
-<PatientDashboard>:
-    # 1. Static Background Layer
+# --- BASIC REPORT SECTION ---
+<ReportCard>:
+    orientation: 'vertical'
+    padding: dp(10)
+    spacing: dp(5)
+    background_color: get_color_from_hex("#FFFFFF")
+    elevation: 2
+    
+    Label:
+        text: root.icon
+        font_size: '22sp'
+        size_hint_y: 0.4
+    Label:
+        text: root.value
+        font_size: '18sp'
+        bold: True
+        color: root.text_color
+        size_hint_y: 0.3
+    Label:
+        text: root.title
+        font_size: '11sp'
+        color: get_color_from_hex("#888888")
+        size_hint_y: 0.3
+
+<BasicReportSection>:
+    cols: 2
+    size_hint_y: None
+    height: dp(220)
+    spacing: dp(15)
+
+    ReportCard:
+        icon: "❤️"
+        title: "Heart Rate"
+        value: "72 bpm"
+        text_color: get_color_from_hex("#E74C3C")
+    ReportCard:
+        icon: "🩸"
+        title: "Blood Pressure"
+        value: "120/80"
+        text_color: get_color_from_hex("#3498DB")
+    ReportCard:
+        icon: "🌬️"
+        title: "SpO2"
+        value: "98 %"
+        text_color: get_color_from_hex("#27AE60")
+    ReportCard:
+        icon: "🌡️"
+        title: "Temperature"
+        value: "98.6 °F"
+        text_color: get_color_from_hex("#F39C12")
+
+
+# --- VITALS SECTION ---
+<VitalsSection>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: dp(10)
+
+    Label:
+        text: "Graphical Trends"
+        font_size: '20sp'
+        bold: True
+        size_hint_y: None
+        height: dp(30)
+        halign: 'left'
+        text_size: self.size
+    
+    GridLayout:
+        cols: 2
+        spacing: dp(15)
+        size_hint_y: None
+        height: dp(180)
+        
+        RoundedBoxLayout:
+            orientation: 'vertical'
+            padding: dp(10)
+            radius: [dp(10)]
+            Label:
+                text: "HR History"
+                font_size: '12sp'
+                color: get_color_from_hex("#AAAAAA")
+                size_hint_y: None
+                height: dp(15)
+                halign: 'left'
+                text_size: self.size
+            BoxLayout:
+                id: hr_container
+            Label:
+                text: "Last 24h"
+                font_size: '10sp'
+                color: get_color_from_hex("#AAAAAA")
+                size_hint_y: None
+                height: dp(12)
+                halign: 'right'
+                text_size: self.size
+
+        RoundedBoxLayout:
+            orientation: 'vertical'
+            padding: dp(10)
+            radius: [dp(10)]
+            Label:
+                text: "BP Trends"
+                font_size: '12sp'
+                color: get_color_from_hex("#AAAAAA")
+                size_hint_y: None
+                height: dp(15)
+                halign: 'left'
+                text_size: self.size
+            BoxLayout:
+                id: bp_container
+            Label:
+                text: "Last 24h"
+                font_size: '10sp'
+                color: get_color_from_hex("#AAAAAA")
+                size_hint_y: None
+                height: dp(12)
+                halign: 'right'
+                text_size: self.size
+
+# --- NEW: POPUP SCREEN FOR REPORTS ---
+<LabReportPopup>:
+    size_hint: 0.9, 0.85
+    background_color: 0, 0, 0, 0.5
+    
+    RoundedBoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(15)
+        background_color: 1, 1, 1, 1
+        radius: [dp(15)]
+        
+        # Header
+        BoxLayout:
+            size_hint_y: None
+            height: dp(40)
+            Label:
+                text: root.report_title
+                font_size: '22sp'
+                bold: True
+                color: get_color_from_hex("#2C3E50")
+                halign: 'left'
+                text_size: self.size
+            Button:
+                text: "✖"
+                font_size: '20sp'
+                size_hint_x: None
+                width: dp(40)
+                background_normal: ''
+                background_color: 0,0,0,0
+                color: get_color_from_hex("#E74C3C")
+                on_release: root.close_popup()
+
+        # Dummy Image / Content for report
+        Image:
+            source: 'assets/ill-2.png' # Using existing image as placeholder
+            allow_stretch: True
+            keep_ratio: True
+            opacity: 0.8
+
+        Label:
+            text: "This is a digital copy of the verified lab report.\nAll parameters are within/outside range as visualized."
+            halign: 'center'
+            color: get_color_from_hex("#555555")
+            size_hint_y: None
+            height: dp(40)
+        
+        Button:
+            text: "Download PDF"
+            size_hint_y: None
+            height: dp(50)
+            background_normal: ''
+            background_color: get_color_from_hex("#3498DB")
+            bold: True
+            on_release: root.close_popup()
+
+# --- LAB ITEMS (Modified with Button) ---
+<LabItem>:
+    size_hint_y: None
+    height: dp(60) # Increased height slightly
+    spacing: dp(10)
+
+    RoundedBoxLayout:
+        size_hint: None, None
+        size: dp(40), dp(40)
+        radius: [dp(20)]
+        background_color: get_color_from_hex("#E0EFFF")
+        pos_hint: {'center_y': 0.5}
+        Label:
+            text: "📄"
+            font_size: '20sp'
+            color: get_color_from_hex("#3498DB")
+            halign: 'center'
+            valign: 'middle'
+
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: root.title
+            halign: 'left'
+            text_size: self.size
+            valign: 'bottom'
+            bold: True
+        Label:
+            text: root.subtitle
+            font_size: '12sp'
+            color: get_color_from_hex("#888888")
+            halign: 'left'
+            text_size: self.size
+            valign: 'top'
+
+    # --- THE VIEW REPORT BUTTON ---
+    Button:
+        text: "View Report"
+        size_hint_x: None
+        width: dp(100)
+        size_hint_y: None
+        height: dp(32)
+        pos_hint: {'center_y': 0.5}
+        background_normal: ''
+        background_color: get_color_from_hex("#2ECC71") # Green button
+        color: 1, 1, 1, 1
+        font_size: '12sp'
+        bold: True
+        # Calls the function defined in patient.py
+        on_release: root.view_report() 
+
+<LabsSection>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: dp(10)
+    
+    Label:
+        text: "Recent Lab Results"
+        font_size: '20sp'
+        bold: True
+        size_hint_y: None
+        height: dp(30)
+        halign: 'left'
+        text_size: self.size
+
+    BoxLayout:
+        id: lab_container
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: dp(10)
+
+
+# --- MAIN ROOT ---
+<DashboardRoot>:
+    do_scroll_x: False
+    
+    # --- BACKGROUND IMAGE LOGIC ---
     canvas.before:
         Color:
-            rgba: 0.98, 0.98, 0.98, 1
+            rgba: 1, 1, 1, 1
         Rectangle:
             pos: self.pos
             size: self.size
-
-    Image:
-        source: 'assets/ill-2.png'
-        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-        size_hint: 1.2, 1.2 
-        allow_stretch: True 
-        keep_ratio: True
-        opacity: 0.5
-
-    # 2. Main Layout (Splits Title Bar and Content)
-    BoxLayout:
-        orientation: 'vertical'
-        size_hint: 1, 1
-
-        # --- GREEN TITLE BAR (Fixed at Top) ---
-        BoxLayout:
+        
+        Color:
+            rgba: 1, 1, 1, 0.15 
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'assets/background_image.png' # Ensure filename matches!
+            
+    GridLayout:
+        cols: 1
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: dp(20)
+        padding: dp(15)
+        
+        PatientHeader:
+        AlertCard:
+        Label:
+            text: "Current Vitals"
+            font_size: '20sp'
+            bold: True
             size_hint_y: None
-            height: dp(60)
-            spacing: dp(10)
-            padding: [dp(10), 0]
-            orientation: 'horizontal'
+            height: dp(20)
+            halign: 'left'
+            text_size: self.size
             
-            # Green Background
-            canvas.before:
-                Color:
-                    rgba: get_color_from_hex("#2ECC71") # Green Color
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-
-            # Back Button (Arrow) - White Color
-            Button:
-                text: u"\u2190"  # Unicode Left Arrow
-                font_size: '35sp'
-                bold: True
-                size_hint_x: None
-                width: dp(50)
-                background_normal: ''
-                background_color: 0, 0, 0, 0 # Transparent bg
-                color: 1, 1, 1, 1 # White text
-                on_release: root.go_back()
-
-            # Dashboard Title - White Color
-            Label:
-                text: 'Patient Dashboard'
-                font_size: '24sp'
-                bold: True
-                halign: 'left'
-                valign: 'middle'
-                text_size: self.size
-                color: 1, 1, 1, 1 # White text
-
-        # --- SCROLLABLE CONTENT AREA ---
-        ScrollView:
-            do_scroll_x: False
-            do_scroll_y: True
-            bar_width: dp(5)
-            
-            # Content Container
-            BoxLayout:
-                orientation: 'vertical'
-                size_hint_y: None
-                height: self.minimum_height
-                padding: dp(15)
-                spacing: dp(20)
-
-                # --- Patient Info Grid ---
-                GridLayout:
-                    cols: 2
-                    size_hint_y: None
-                    height: dp(100)
-                    spacing: dp(5)
-                    
-                    BoxLayout:
-                        Label: 
-                            text: 'Name: '
-                            bold: True
-                            size_hint_x: 0.4
-                            halign: 'right'
-                            text_size: self.size
-                        Label: 
-                            text: 'Chetan'
-                            halign: 'left'
-                            text_size: self.size
-                    BoxLayout:
-                        Label: 
-                            text: 'Room: '
-                            bold: True
-                            size_hint_x: 0.4
-                            halign: 'right'
-                            text_size: self.size
-                        Label: 
-                            text: '305B'
-                            halign: 'left'
-                            text_size: self.size
-                    BoxLayout:
-                        Label: 
-                            text: 'Age: '
-                            bold: True
-                            size_hint_x: 0.4
-                            halign: 'right'
-                            text_size: self.size
-                        Label: 
-                            text: '25'
-                            halign: 'left'
-                            text_size: self.size
-                    BoxLayout:
-                        Label: 
-                            text: 'Status: '
-                            bold: True
-                            size_hint_x: 0.4
-                            halign: 'right'
-                            text_size: self.size
-                        Label: 
-                            text: 'Stable'
-                            halign: 'left'
-                            text_size: self.size
-
-                # --- Vitals Section ---
-                BoldLabel:
-                    text: 'Current Vitals'
-                    font_size: '20sp'
-                    size_hint_y: None
-                    height: dp(30)
-                    text_size: self.size
-                    halign: 'left'
-
-                GridLayout:
-                    cols: 2
-                    spacing: dp(15)
-                    size_hint_y: None
-                    height: dp(240)
-                    
-                    VitalBox:
-                        title: 'Heart Rate'
-                        value: '78'
-                        unit: 'bpm'
-                        box_color: get_color_from_hex("#E74C3C")
-                    VitalBox:
-                        title: 'Blood Pressure'
-                        value: '122/81'
-                        unit: 'mmHg'
-                        box_color: get_color_from_hex("#3498DB")
-                    VitalBox:
-                        title: 'SpO2'
-                        value: '97'
-                        unit: '%'
-                        box_color: get_color_from_hex("#2ECC71")
-                    VitalBox:
-                        title: 'Temperature'
-                        value: '98.4'
-                        unit: 'deg F'
-                        box_color: get_color_from_hex("#F39C12")
-
-                # --- Main Graph Section ---
-                BoldLabel:
-                    text: 'Vitals Trend (12 Hours)'
-                    font_size: '20sp'
-                    size_hint_y: None
-                    height: dp(30)
-                    text_size: self.size
-                    halign: 'left'
-
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_y: None
-                    height: dp(250)
-                    canvas.before:
-                        Color:
-                            rgba: 1, 1, 1, 0.8
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [10,]
-                    
-                    Graph:
-                        id: vitals_graph
-                        xlabel: 'Hour'
-                        ylabel: 'Value'
-                        x_ticks_minor: 1
-                        x_ticks_major: 2
-                        y_ticks_major: 20
-                        y_grid_label: True
-                        x_grid_label: True
-                        padding: dp(5)
-                        x_grid: True
-                        y_grid: True
-                        xmin: 0
-                        xmax: 11
-                        ymin: 60
-                        ymax: 140
-                        label_options: {'color': get_color_from_hex("#000000"), 'bold': True}
-                        background_color: 1, 1, 1, 0 
-                        tick_color: get_color_from_hex("#888888")
-                        border_color: get_color_from_hex("#888888")
-
-                # --- Bottom Section (Overview & Activities) ---
-                GridLayout:
-                    cols: 1
-                    size_hint_y: None
-                    height: dp(500)
-                    spacing: dp(15)
-
-                    # Health Overview Graph Box
-                    BoxLayout:
-                        orientation: 'vertical'
-                        canvas.before:
-                            Color:
-                                rgba: 0.95, 0.95, 0.95, 1
-                            RoundedRectangle:
-                                pos: self.pos
-                                size: self.size
-                                radius: [10,]
-                        padding: dp(10)
-
-                        Label:
-                            text: "Health Overview (30 Days)"
-                            font_size: '16sp'
-                            bold: True
-                            size_hint_y: None
-                            height: dp(30)
-                            color: 0.2, 0.2, 0.2, 1
-
-                        Graph:
-                            id: health_graph
-                            xlabel: "Days"
-                            ylabel: "Score"
-                            xmin: 0
-                            xmax: 30
-                            ymin: 0
-                            ymax: 100
-                            label_options: {'color': [0,0,0,1]}
-
-                    # Recent Activities Box
-                    BoxLayout:
-                        orientation: 'vertical'
-                        canvas.before:
-                            Color:
-                                rgba: 0.95, 0.95, 0.95, 1
-                            RoundedRectangle:
-                                pos: self.pos
-                                size: self.size
-                                radius: [10,]
-                        padding: dp(10)
-
-                        Label:
-                            text: "Recent Activities"
-                            font_size: '16sp'
-                            bold: True
-                            size_hint_y: None
-                            height: dp(30)
-                            color: 0.2, 0.2, 0.2, 1
-
-                        BoxLayout:
-                            orientation: 'vertical'
-                            spacing: dp(5)
-                            
-                            ActivityItem:
-                                icon: "assets/medicine.png"
-                                text: "Took Medicine (2:00 PM)"
-                            ActivityItem:
-                                icon: "assets/appointment.png"
-                                text: "Dr. Smith Visit"
-                            ActivityItem:
-                                icon: "assets/exercise.png"
-                                text: "Morning Walk (30m)"
-                            ActivityItem:
-                                icon: "assets/medicine.png"
-                                text: "Took Medicine (8:00 AM)"
-                            
-                            Widget:
+        BasicReportSection:
+        VitalsSection:
+        LabsSection:

@@ -2,110 +2,154 @@ import kivy
 import os
 import random
 from kivy.app import App
-from kivy.uix.screenmanager import Screen
-from kivy.uix.floatlayout import FloatLayout # Changed from BoxLayout to FloatLayout
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import StringProperty, ColorProperty
-from kivy.clock import Clock
-from kivy.lang import Builder
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.modalview import ModalView # Required for the Report Screen
+from kivy.properties import StringProperty, ListProperty, ColorProperty
 from kivy.utils import get_color_from_hex
+from kivy.metrics import dp
 from kivy.core.window import Window
-
-# Set a standard size for testing on PC, remove this for mobile
-Window.size = (400, 750)
+from kivy.lang import Builder
+from kivy.clock import Clock
 
 # --- Import Kivy Garden Graph ---
 try:
-    from kivy_garden.graph import Graph, MeshLinePlot
+    from kivy_garden.graph import Graph, MeshLinePlot, MeshStemPlot
 except ImportError:
-    # Create a dummy class so the app doesn't crash if graph isn't installed
-    class Graph(BoxLayout): pass
-    class MeshLinePlot(object): 
-        def __init__(self, **kwargs): pass
-        points = []
-    print("Warning: kivy_garden.graph not found. Graphs will not render.")
+    Graph = None
+    MeshLinePlot = None
 
-kivy.require('2.1.0')
+# --- LOAD KV FILE ---
+if __name__ != '__main__':
+    if os.path.exists('kv/patient.kv'):
+        Builder.load_file('kv/patient.kv')
+else:
+    if os.path.exists('kv/patient.kv'):
+        Builder.load_file('kv/patient.kv')
 
-class VitalBox(BoxLayout):
-    title = StringProperty('')
-    value = StringProperty('')
-    unit = StringProperty('')
-    box_color = ColorProperty((0, 0, 0, 1))
+class RoundedBoxLayout(BoxLayout):
+    background_color = ColorProperty([1, 1, 1, 1])
+    radius = ListProperty([dp(15)])
 
-# INHERITANCE CHANGED: Now inherits from Screen to allow layering
-class PatientDashboard(Screen):
+class PatientHeader(RoundedBoxLayout):
+    patient_name = StringProperty("Harshit")
+    room_no = StringProperty("302 - ICU")
+    blood_group = StringProperty("O+")
+    aadhar = StringProperty("xxxx-xxxx-2374")
+    gender = StringProperty("Male")
+    phone = StringProperty("+91 9397123561")
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        # Schedule graph setup to run after the KV layout is fully loaded
-        Clock.schedule_once(self.setup_graphs, 0)
+class ReportCard(RoundedBoxLayout):
+    icon = StringProperty("")
+    title = StringProperty("")
+    value = StringProperty("")
+    text_color = ColorProperty([0, 0, 0, 1])
 
-    def setup_graphs(self, dt):
-        # 1. Setup Vitals Trend Graph (Top Graph)
-        if 'vitals_graph' in self.ids:
-            graph = self.ids.vitals_graph
-            
-            # Create plots
-            self.hr_plot = MeshLinePlot(color=get_color_from_hex("#E74C3C"))
-            self.bp_plot = MeshLinePlot(color=get_color_from_hex("#3498DB"))
-            
-            # Initial Data
-            self.hr_plot.points = [(i, random.randint(70, 85)) for i in range(12)]
-            self.bp_plot.points = [(i, random.randint(110, 130)) for i in range(12)]
+class BasicReportSection(GridLayout):
+    pass
 
-            # Add to graph
-            try:
-                graph.add_plot(self.hr_plot)
-                graph.add_plot(self.bp_plot)
-            except AttributeError:
-                pass # Handle case where graph lib is missing
+class AlertCard(RoundedBoxLayout):
+    pass
 
-        # 2. Setup Health Overview Graph (Bottom Graph)
-        if 'health_graph' in self.ids:
-            health_graph = self.ids.health_graph
-            health_plot = MeshLinePlot(color=[0.2, 0.6, 0.4, 1])
-            health_plot.points = [(x, (x * 2 + 50) % 100) for x in range(30)]
-            try:
-                health_graph.add_plot(health_plot)
-            except AttributeError:
-                pass
+class VitalsSection(BoxLayout):
+    def on_kv_post(self, base_widget):
+        if not Graph: return
+        
+        # 1. Initialize Data
+        self.hr_data_points = [60 + random.randint(-5, 5) for _ in range(20)]
+        self.bp_x_positions = [15, 35, 55, 75] 
+        self.bp_data_points = [120, 118, 122, 119] 
 
-        # Start live update
-        Clock.schedule_interval(self.update_graph, 1.5)
+        # 2. Add graphs
+        self.add_graphs()
 
-    def update_graph(self, dt):
-        # Update Heart Rate
-        if hasattr(self, 'hr_plot'):
-            current_hr_y = [point[1] for point in self.hr_plot.points]
-            new_hr_y = current_hr_y[1:] + [random.randint(70, 90)]
-            self.hr_plot.points = [(i, y) for i, y in enumerate(new_hr_y)]
+        # 3. Schedule updates
+        Clock.schedule_interval(self.update_charts, 1)
+
+    def add_graphs(self):
+        # Heart Rate
+        hr_graph = Graph(
+            xmin=0, xmax=20, ymin=40, ymax=140,
+            x_grid=False, y_grid=True, draw_border=False, padding=5,
+            y_ticks_major=25
+        )
+        self.hr_plot = MeshLinePlot(color=get_color_from_hex("#3498DB"))
+        hr_graph.add_plot(self.hr_plot)
+        self.ids.hr_container.add_widget(hr_graph)
+        
+        # Blood Pressure
+        bp_graph = Graph(
+            xmin=0, xmax=100, ymin=50, ymax=180,
+            x_grid=False, y_grid=True, draw_border=False, padding=5,
+            y_ticks_major=50
+        )
+        self.bp_plot = MeshStemPlot(color=get_color_from_hex("#E74C3C"))
+        bp_graph.add_plot(self.bp_plot)
+        self.ids.bp_container.add_widget(bp_graph)
+
+    def update_charts(self, dt):
+        if not hasattr(self, 'hr_plot'): return
+        
+        # Update HR
+        new_hr = random.randint(60, 100)
+        self.hr_data_points.pop(0)
+        self.hr_data_points.append(new_hr)
+        points_list = [(i, val) for i, val in enumerate(self.hr_data_points)]
+        self.hr_plot.points = points_list
 
         # Update BP
-        if hasattr(self, 'bp_plot'):
-            current_bp_y = [point[1] for point in self.bp_plot.points]
-            new_bp_y = current_bp_y[1:] + [random.randint(115, 135)]
-            self.bp_plot.points = [(i, y) for i, y in enumerate(new_bp_y)]
+        new_bp = random.randint(110, 130)
+        self.bp_data_points.pop(0)
+        self.bp_data_points.append(new_bp)
+        bp_points = []
+        for i, x_pos in enumerate(self.bp_x_positions):
+            bp_points.append((x_pos, self.bp_data_points[i]))
+        self.bp_plot.points = bp_points
+
+# --- NEW: Lab Report Screen (Popup) ---
+class LabReportPopup(ModalView):
+    report_title = StringProperty("Lab Report")
+    
+    def close_popup(self):
+        self.dismiss()
+
+class LabItem(BoxLayout):
+    title = StringProperty("")
+    subtitle = StringProperty("")
+    
+    def view_report(self):
+        """ Opens the report popup screen """
+        popup = LabReportPopup()
+        popup.report_title = self.title
+        popup.open()
+
+class LabsSection(BoxLayout):
+    def on_kv_post(self, base_widget):
+        labs = [
+            ("Blood Analysis", "Hemoglobin & Platelets"),
+            ("X-Ray Report", "Chest cavity scan"),
+            ("Urinalysis", "Routine checkup"),
+        ]
+        for title, subtitle in labs:
+            item = LabItem(title=title, subtitle=subtitle)
+            self.ids.lab_container.add_widget(item)
+
+class DashboardRoot(ScrollView):
+    def update_patient_info(self, name_text):
+        """ Helper function to find the Header and update the name. """
+        if not self.children: return
+        main_layout = self.children[0] 
+        for widget in main_layout.children:
+            if isinstance(widget, PatientHeader):
+                widget.patient_name = name_text
+                print(f"Updated Patient Dashboard to: {name_text}")
+                return
 
 class PatientDashboardApp(App):
     def build(self):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        kv_file_path = os.path.join(current_dir, 'kv', 'patient.kv')
-        
-        # Robust KV loading
-        try:
-            Builder.load_file(kv_file_path)
-        except FileNotFoundError:
-            try:
-                Builder.load_file("kv/patient.kv")
-            except Exception as e:
-                print(f"KV Load Error: {e}")
-                return BoxLayout() 
-
-        return PatientDashboard()
-    
-    def go_back(self):
-        self.manager.current = "landing"
+        Window.size = (400, 800)
+        return DashboardRoot()
 
 if __name__ == '__main__':
     PatientDashboardApp().run()
