@@ -12,7 +12,7 @@ from screens.splash import SplashScreen            #todo: animation code for spl
 from screens.login import LoginSignupScreen        #todo: login and signup functionality
 from screens.dashboard import HomeDashboardScreen  #todo: user dashboard after login
 from screens.landing import LandingScreen          #todo: import landing screen
-#from screens.patient import PatientDashboard
+from screens.patient import PatientDashboard
 #from screens.doctor import DoctorDashboard
 
 #! import admin screens
@@ -40,7 +40,7 @@ Builder.load_file("kv/login.kv")
 Builder.load_file("kv/dashboard.kv")
 Builder.load_file("kv/landing.kv")
 Builder.load_file("kv/admin.kv")
-#Builder.load_file("kv/patient.kv")
+Builder.load_file("kv/patient.kv")
 #Builder.load_file("kv/doctor.kv")
 
 
@@ -56,7 +56,7 @@ class HealthcareApp(App):
         sm.add_widget(LandingScreen(name="landing"))
         sm.add_widget(LoginSignupScreen(name="login"))
         sm.add_widget(HomeDashboardScreen(name="dashboard"))
-        #sm.add_widget(PatientDashboard(name="patient"))     
+        sm.add_widget(PatientDashboard(name="patient"))     
         #sm.add_widget(DoctorDashboard(name="doctor"))
 
 

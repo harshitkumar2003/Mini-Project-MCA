@@ -288,7 +288,7 @@
 
         # Dummy Image / Content for report
         Image:
-            source: 'assets/ill-2.png' # Using existing image as placeholder
+            source: 'assets/DReport.png' # Using existing image as placeholder
             allow_stretch: True
             keep_ratio: True
             opacity: 0.8
@@ -307,7 +307,7 @@
             background_normal: ''
             background_color: get_color_from_hex("#3498DB")
             bold: True
-            on_release: root.close_popup()
+            on_release: root.download_report()
 
 # --- LAB ITEMS (Modified with Button) ---
 <LabItem>:
@@ -383,43 +383,47 @@
         spacing: dp(10)
 
 
-# --- MAIN ROOT ---
-<DashboardRoot>:
-    do_scroll_x: False
+# ------------------------------------------------------------------
+# MAIN ROOT MODIFICATION: Convert DashboardRoot to PatientDashboard Screen
+# ------------------------------------------------------------------
+<PatientDashboard>:
+    name: 'patient' 
     
-    # --- BACKGROUND IMAGE LOGIC ---
-    canvas.before:
-        Color:
-            rgba: 1, 1, 1, 1
-        Rectangle:
-            pos: self.pos
-            size: self.size
+    ScrollView:
+        do_scroll_x: False
         
-        Color:
-            rgba: 1, 1, 1, 0.15 
-        Rectangle:
-            pos: self.pos
-            size: self.size
-            source: 'assets/background_image.png' # Ensure filename matches!
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
             
-    GridLayout:
-        cols: 1
-        size_hint_y: None
-        height: self.minimum_height
-        spacing: dp(20)
-        padding: dp(15)
-        
-        PatientHeader:
-        AlertCard:
-        Label:
-            text: "Current Vitals"
-            font_size: '20sp'
-            bold: True
+            Color:
+                rgba: 1, 1, 1, 0.15 
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'assets/background_image.png' # Ensure filename matches!
+            
+        GridLayout:
+            cols: 1
             size_hint_y: None
-            height: dp(20)
-            halign: 'left'
-            text_size: self.size
+            height: self.minimum_height
+            spacing: dp(20)
+            padding: dp(15)
             
-        BasicReportSection:
-        VitalsSection:
-        LabsSection:
+            PatientHeader:
+            AlertCard:
+            Label:
+                text: "Current Vitals"
+                font_size: '20sp'
+                bold: True
+                size_hint_y: None
+                height: dp(20)
+                halign: 'left'
+                text_size: self.size
+            
+            BasicReportSection:
+            VitalsSection:
+            LabsSection:

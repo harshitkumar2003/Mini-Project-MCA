@@ -1,11 +1,15 @@
+from datetime import datetime
 import kivy
 import os
+import shutil #!for download module location handling
 import random
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.modalview import ModalView # Required for the Report Screen
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
 from kivy.properties import StringProperty, ListProperty, ColorProperty
 from kivy.utils import get_color_from_hex
 from kivy.metrics import dp
@@ -115,6 +119,56 @@ class LabReportPopup(ModalView):
     def close_popup(self):
         self.dismiss()
 
+    def download_report(self):
+        try:
+            # 1. Source File Path
+            # Use os.path.join with App.get_running_app().directory for app-relative paths
+            app_dir = App.get_running_app().directory
+            source_filename = 'DReport.png'
+            source_path = os.path.join(app_dir, 'assets', source_filename)
+            
+            # 🌟 PATH CHECK 1: Ensure Source File Exists
+            if not os.path.exists(source_path):
+                self.show_download_popup("Download Failed", 
+                                         f"Source PDF file not found at:\n{source_path}")
+                return
+
+            # 2. Destination Directory: Prioritize Downloads, then Desktop/Home
+            # os.path.expanduser('~') is reliable for home directory.
+            
+            download_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
+            if not os.path.isdir(download_dir):
+                 download_dir = os.path.join(os.path.expanduser('~'), 'Desktop') 
+            
+            # Fallback to home directory if Desktop/Downloads are inaccessible
+            if not os.path.isdir(download_dir):
+                download_dir = os.path.expanduser('~')
+
+            # 3. Destination filename (Using self.report_title for unique naming)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"Report_{self.report_title.replace(' ', '_')}_{timestamp}.png"
+            destination_path = os.path.join(download_dir, filename)
+
+            # 4. Copy the file
+            shutil.copyfile(source_path, destination_path)
+            
+            # 5. Success message
+            self.show_download_popup("Success", 
+                                     f"Report saved to:\n{download_dir}\nFile: {filename}")
+            
+        except Exception as e:
+            # Show the specific exception message for debugging
+            self.show_download_popup("Download Failed", 
+                                     f"Could not save file:\n{type(e).__name__}: {e}")
+            
+    def show_download_popup(self, title, message):
+        # Simple popup utility for feedback
+        Popup(title=title, content=Label(text=message),
+              size_hint=(0.7, 0.4)).open()
+              
+        # Close the report view after showing the download status
+        Clock.schedule_once(lambda dt: self.dismiss(), 2) # Close after 2 seconds
+
 class LabItem(BoxLayout):
     title = StringProperty("")
     subtitle = StringProperty("")
@@ -136,21 +190,26 @@ class LabsSection(BoxLayout):
             item = LabItem(title=title, subtitle=subtitle)
             self.ids.lab_container.add_widget(item)
 
-class DashboardRoot(ScrollView):
+class PatientDashboard(Screen):
     def update_patient_info(self, name_text):
         """ Helper function to find the Header and update the name. """
-        if not self.children: return
+        if not self.children: return 
         main_layout = self.children[0] 
+        # Check widgets inside the main layout
         for widget in main_layout.children:
-            if isinstance(widget, PatientHeader):
-                widget.patient_name = name_text
-                print(f"Updated Patient Dashboard to: {name_text}")
-                return
+            if isinstance(widget, ScrollView): # Assuming the main ScrollView is the immediate child
+                # Search inside the ScrollView content
+                scroll_content = widget.children[0] 
+                for sub_widget in scroll_content.children:
+                    if isinstance(sub_widget, PatientHeader):
+                        sub_widget.patient_name = name_text
+                        print(f"Updated Patient Dashboard to: {name_text}")
+                        return
 
 class PatientDashboardApp(App):
     def build(self):
         Window.size = (400, 800)
-        return DashboardRoot()
+        return PatientDashboard()
 
 if __name__ == '__main__':
     PatientDashboardApp().run()
