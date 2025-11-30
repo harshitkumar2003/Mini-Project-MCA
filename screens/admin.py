@@ -9,10 +9,11 @@ from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
-from kivy.core.window import Window
+from kivy.core.window import Window 
 
-#Window.size = (360, 700)
-Window.clearcolor = (1, 1, 1, 1)
+Window.clearcolor = (0.9, 0.9, 0.9, 1) # Light gray background
+
+# ----------------------- DB SETUP -----------------------
 
 DB_PATH = "users.db"  # single DB for both login and profiles
 
@@ -25,6 +26,7 @@ def init_db():
     c.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT UNIQUE,
             name TEXT,
             email TEXT,
             aadhaar TEXT UNIQUE,
@@ -37,6 +39,7 @@ def init_db():
     c.execute("""
         CREATE TABLE IF NOT EXISTS patient_personal (
             aadhaar TEXT PRIMARY KEY,
+            patientid TEXT UNIQUE,
             name TEXT,
             email TEXT,
             gender TEXT,
@@ -77,6 +80,7 @@ def init_db():
     c.execute("""
         CREATE TABLE IF NOT EXISTS doctor_info (
             aadhaar TEXT PRIMARY KEY,
+            doctorid TEXT UNIQUE,
             name TEXT,
             phone TEXT,
             gender TEXT,
@@ -88,16 +92,46 @@ def init_db():
             password TEXT
         )
     """)
+     # Add userid columns to existing tables (safe migration)
+    try:
+        c.execute("ALTER TABLE users ADD COLUMN user_id TEXT UNIQUE")
+    except sqlite3.OperationalError:
+        pass 
+    
     conn.commit()
     conn.close()
 
-# initialize DB at import
 init_db()
 
 # ----------------------- Simple popup helper -----------------------
-def show_popup(title, message):
-    Popup(title=title, content=Label(text=message),
+def show_popup(title, message):   
+    Popup(title=title, content=Label(text=message , color=(1,1,1,1)),
           size_hint=(0.7, 0.4)).open()
+    
+# ----------------------Helper: Generate next UserID -----------------------
+def generate_new_id(role):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    prefix = "THP" if role == "Patient" else "THD"
+    
+    # Login table (users) se last ID nikalo jo iss prefix se start hoti h
+    c.execute("SELECT user_id FROM users WHERE user_id LIKE ? ORDER BY id DESC LIMIT 1", (f'{prefix}%',))
+    result = c.fetchone()
+    conn.close()
+    
+    if result and result[0]:
+        last_id = result[0] # e.g. THP-000005
+        # Last ke digits nikalke +1 kr rhe h
+        try:
+            number_part = int(last_id.split('-')[1])
+            new_number = number_part + 1
+        except:
+            new_number = 1
+    else:
+        new_number = 1 # Pehla user
+        
+    return f"{prefix}-{new_number:06d}"
 
 # ----------------------- EDIT/ADD POPUP (small/simple) -----------------------
 class EditPopup(Popup):
@@ -154,22 +188,12 @@ class EditableTable(GridLayout):
 class HomeScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Commit: Home screen UI bana raha hoon - buttons for patient & doctor
-        #layout = BoxLayout(orientation="vertical", padding=40, spacing=20)
-        #layout.add_widget(Label(text="[b]Admin Dashboard[/b]", markup=True, font_size=28, size_hint_y=None, height=80, color=(0,0,0,1)))
-        #btn1 = Button(text="Patient Information", size_hint_y=None, height=60)
-        #btn1.bind(on_release=lambda x: setattr(self.manager, "current", "patient_list"))
-        #btn2 = Button(text="Doctor Information", size_hint_y=None, height=60)
-        #btn2.bind(on_release=lambda x: setattr(self.manager, "current", "doctor_list"))
-        #layout.add_widget(btn1)
-        #layout.add_widget(btn2)
-        #self.add_widget(layout)
-
+       
 # ----------------------- PATIENT LIST SCREEN (EditableTable) -----------------------
 class PatientListScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.fields = ["Name", "Age", "Blood Group", "Condition", "Aadhaar"]
+        self.fields = ["UserID", "Name", "Password", "Aadhaar", "Age"]
         # Commit: Load patient data from DB
         self.build()
 
@@ -212,25 +236,45 @@ class PatientListScreen(Screen):
 
     # Commit: Fetch brief patient data for table (name, age, blood_group, condition, aadhaar)
     def fetch_all_patients_short(self):
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute("SELECT p.name, '', p.blood_group, m.chronic_disease, p.aadhaar FROM patient_personal p LEFT JOIN patient_medical m ON p.aadhaar = m.aadhaar")
-        rows = c.fetchall()
-        conn.close()
-        return rows
+       conn = sqlite3.connect(DB_PATH)
+       c = conn.cursor()
+       c.execute("""
+        SELECT p.patientid, p.name, p.password, p.aadhaar, p.blood_group 
+        FROM patient_personal p
+       """)
+       rows = c.fetchall()  
+       conn.close()
+       return rows
 
     # Commit: search by aadhaar
     def search_patient(self):
         aadhaar = self.search_input.text.strip()
+        
+        # Agar search box khali h to kuch mat karo ya error dikha do
+        if not aadhaar:
+            show_popup("Error", "Please enter Aadhaar number.")
+            return
+
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute("SELECT p.name, '', p.blood_group, m.chronic_disease, p.aadhaar FROM patient_personal p LEFT JOIN patient_medical m ON p.aadhaar = m.aadhaar WHERE p.aadhaar=?", (aadhaar,))
+        
+        # 🛠️ FIX: 'u.userid' ko badal kar 'u.user_id' kar diya
+        c.execute("""
+        SELECT u.user_id, p.name, u.password, p.aadhaar, p.blood_group 
+        FROM patient_personal p 
+        JOIN users u ON p.aadhaar = u.aadhaar
+        LEFT JOIN patient_medical m ON p.aadhaar = m.aadhaar
+        WHERE p.aadhaar=?
+        """, (aadhaar,))
+        
         rows = c.fetchall()
         conn.close()
-        # rebuild table
+        
+        # Rebuild UI with search results
         self.clear_widgets()
         main = BoxLayout(orientation="vertical", padding=10, spacing=8)
         main.add_widget(Label(text="[b]Patient Information[/b]", markup=True, font_size=22, size_hint_y=None, height=50, color=(0,0,0,1)))
+        
         search_row = BoxLayout(size_hint_y=None, height=40, spacing=8)
         self.search_input = TextInput(text=aadhaar, multiline=False)
         btn_search = Button(text="Search", size_hint_x=None, width=100)
@@ -240,22 +284,26 @@ class PatientListScreen(Screen):
         search_row.add_widget(self.search_input)
         search_row.add_widget(btn_search)
         search_row.add_widget(btn_clear)
+        
         btn_add = Button(text="Add New Patient", size_hint_y=None, height=50)
         btn_add.bind(on_release=lambda x: setattr(self.manager, "current", "patient_add"))
+        
         scroll = ScrollView()
+        # Agar koi result nahi mila to popup dikhao
+        if not rows:
+            show_popup("Info", "No patient found with this Aadhaar.")
+        
         table = EditableTable(self.fields, rows, self.edit_patient, self.delete_patient)
         scroll.add_widget(table)
+        
         btn_back = Button(text="Back", size_hint_y=None, height=50)
         btn_back.bind(on_release=lambda x: setattr(self.manager, "current", "home"))
+        
         main.add_widget(search_row)
         main.add_widget(btn_add)
         main.add_widget(scroll)
         main.add_widget(btn_back)
         self.add_widget(main)
-
-    def clear_search(self):
-        self.search_input.text = ""
-        self.build()
 
     # Commit: Edit patient - open add-screen in edit mode with aadhaar
     def edit_patient(self, index):
@@ -264,7 +312,7 @@ class PatientListScreen(Screen):
         if index < 0 or index >= len(rows):
             show_popup("Error", "Invalid index")
             return
-        aadhaar = rows[index][4]
+        aadhaar = rows[index][3]
         self.manager.get_screen('patient_add').load_for_edit(aadhaar)
         self.manager.current = 'patient_add'
 
@@ -274,7 +322,7 @@ class PatientListScreen(Screen):
         if index < 0 or index >= len(rows):
             show_popup("Error", "Invalid index")
             return
-        aadhaar = rows[index][4]
+        aadhaar = rows[index][3]
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         # delete from child tables if exist
@@ -286,6 +334,12 @@ class PatientListScreen(Screen):
         conn.commit()
         conn.close()
         show_popup("Success", "Patient deleted.")
+        self.build()
+
+    def clear_search(self):
+        if hasattr(self, 'search_input'):
+             self.search_input.text = ""
+        # UI ko reset karke saara data wapas load krdega
         self.build()
 
 # ----------------------- PATIENT ADD / EDIT Multi-Page Screen -----------------------
@@ -438,7 +492,7 @@ class PatientAddScreen(Screen):
 
     # Commit: Save patient to DB (insert or update)
     def save_patient(self):
-        # gather values
+        # 1. Gather values from TextInputs
         aadhaar = self.p_aadhaar.text.strip()
         name = self.p_name.text.strip()
         email = self.p_email.text.strip()
@@ -463,132 +517,158 @@ class PatientAddScreen(Screen):
         food = self.l_food.text.strip()
         occupation = self.l_occupation.text.strip()
 
+        # 2. Validation
         if not aadhaar or not name or not password:
             show_popup("Error", "Aadhaar, Name and Password are required.")
             return
 
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
+        
         try:
+            # ---------------- EDIT MODE (Existing Patient) ----------------
             if self.edit_mode and self.edit_aadhaar:
-                # Commit: Editing existing patient - update all tables
-                # Update personal
+                # Update Personal Info
                 c.execute("""
-                    UPDATE patient_personal SET name=?, email=?, gender=?, dob=?, blood_group=?, marital_status=?, phone=?, location=?, password=? WHERE aadhaar=?
+                    UPDATE patient_personal 
+                    SET name=?, email=?, gender=?, dob=?, blood_group=?, marital_status=?, phone=?, location=?, password=?
+                    WHERE aadhaar=?
                 """, (name, email, gender, dob, blood, marital, phone, location, password, self.edit_aadhaar))
-                # If aadhaar changed, we need to move records. For now, disallow aadhaar change in edit.
-                # Update medical
+                
+                # Update Medical Info (INSERT OR REPLACE handles if it didn't exist before)
                 c.execute("""
                     INSERT OR REPLACE INTO patient_medical (aadhaar, allergies, current_medication, past_medication, chronic_disease, injuries, surgeries)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                 """, (self.edit_aadhaar, allergies, current_med, past_med, chronic, injuries, surgeries))
-                # Update lifestyle
+                
+                # Update Lifestyle Info
                 c.execute("""
                     INSERT OR REPLACE INTO patient_lifestyle (aadhaar, smoking, alcohol, activity_level, food_preference, occupation)
                     VALUES (?, ?, ?, ?, ?, ?)
                 """, (self.edit_aadhaar, smoking, alcohol, activity, food, occupation))
-                # also update users table password / name / phone if exists
-                c.execute("UPDATE users SET name=?, email=?, phone=?, password=? WHERE aadhaar=?", (name, email, phone, password, self.edit_aadhaar))
+                
+                # Update Login Info in Users Table
+                c.execute("""
+                    UPDATE users 
+                    SET name=?, email=?, phone=?, password=?
+                    WHERE aadhaar=?
+                """, (name, email, phone, password, self.edit_aadhaar))
+                
                 conn.commit()
-                show_popup("Success", "Patient updated.")
+                show_popup("Success", "Patient details updated.")
+
+            # ---------------- INSERT MODE (New Patient) ----------------
             else:
-                # Insert new records - ensure aadhaar not duplicate
+                # 1. Check Duplicate Aadhaar
                 c.execute("SELECT aadhaar FROM patient_personal WHERE aadhaar=?", (aadhaar,))
                 if c.fetchone():
                     show_popup("Error", "Aadhaar already exists. Use edit.")
                     conn.close()
                     return
-                # personal
+
+                # 2. Auto Generate New ID (e.g., THP-000001)
+                # Make sure generate_new_id function exists globally in your file
+                new_id = generate_new_id("Patient") 
+                
+                # 3. Insert into Personal Table
                 c.execute("""
-                    INSERT INTO patient_personal (aadhaar, name, email, gender, dob, blood_group, marital_status, phone, location, password)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (aadhaar, name, email, gender, dob, blood, marital, phone, location, password))
-                # medical
+                    INSERT INTO patient_personal (aadhaar, patientid, name, email, gender, dob, blood_group, marital_status, phone, location, password)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (aadhaar, new_id, name, email, gender, dob, blood, marital, phone, location, password))
+                
+                # 4. Insert into Medical Table
                 c.execute("""
                     INSERT INTO patient_medical (aadhaar, allergies, current_medication, past_medication, chronic_disease, injuries, surgeries)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                 """, (aadhaar, allergies, current_med, past_med, chronic, injuries, surgeries))
-                # lifestyle
+                
+                # 5. Insert into Lifestyle Table
                 c.execute("""
                     INSERT INTO patient_lifestyle (aadhaar, smoking, alcohol, activity_level, food_preference, occupation)
                     VALUES (?, ?, ?, ?, ?, ?)
                 """, (aadhaar, smoking, alcohol, activity, food, occupation))
-                # add to users table for login
+                
+                # 6. Insert into Users Table (For Login) - CRITICAL PART
+                # 'user_id' column me 'new_id' jayega
                 c.execute("""
-                    INSERT OR REPLACE INTO users (name, email, aadhaar, phone, password, role)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                """, (name, email, aadhaar, phone, password, "Patient"))
+                    INSERT INTO users (user_id, name, email, aadhaar, phone, password, role)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (new_id, name, email, aadhaar, phone, password, "Patient"))
+                
                 conn.commit()
-                show_popup("Success", "Patient added and login created.")
+                show_popup("Success", f"Patient Added! ID: {new_id}")
+
             conn.close()
-            # reset and go back
+            
+            # Reset fields and go back to list
             self.edit_mode = False
             self.edit_aadhaar = None
             self.manager.get_screen('patient_list').build()
             self.manager.current = "patient_list"
+
         except sqlite3.IntegrityError as e:
             conn.close()
-            show_popup("Error", f"DB error: {e}")
+            show_popup("Error", f"Database Integrity Error: {e}")
         except Exception as e:
             conn.close()
             show_popup("Error", f"Save failed: {e}")
 
 # Commit: Pre-fill fields when editing
-def load_for_edit(self, aadhaar):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT name, email, gender, dob, blood_group, marital_status, phone, location, password FROM patient_personal WHERE aadhaar=?", (aadhaar,))
-    p = c.fetchone()
-    c.execute("SELECT allergies, current_medication, past_medication, chronic_disease, injuries, surgeries FROM patient_medical WHERE aadhaar=?", (aadhaar,))
-    m = c.fetchone()
-    c.execute("SELECT smoking, alcohol, activity_level, food_preference, occupation FROM patient_lifestyle WHERE aadhaar=?", (aadhaar,))
-    l = c.fetchone()
-    conn.close()
-    if not p:
-        show_popup("Error", "Patient data not found.")
-        return
-    # set edit mode
-    self.edit_mode = True
-    self.edit_aadhaar = aadhaar
-    # show page1 and then prefill fields after widgets created
-    self.load_page(1)
-    # we call prefill helper which uses instance widgets
-    # but widgets are only created when load_page called for those pages; we created page1 now
-    self.p_name.text = p[0] or ""
-    self.p_email.text = p[1] or ""
-    self.p_gender.text = p[2] or ""
-    self.p_dob.text = p[3] or ""
-    self.p_blood.text = p[4] or ""
-    self.p_marital.text = p[5] or ""
-    self.p_phone.text = p[6] or ""
-    self.p_location.text = p[7] or ""
-    self.p_password.text = p[8] or ""
-    # medical & lifestyle will fill when those pages are loaded; store temp
-    self._medical_prefill = m or ("", "", "", "", "", "")
-    self._lifestyle_prefill = l or ("", "", "", "", "")
+    def load_for_edit(self, aadhaar):
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT name, email, gender, dob, blood_group, marital_status, phone, location, password FROM     patient_personal WHERE aadhaar=?", (aadhaar,))
+        p = c.fetchone()
+        c.execute("SELECT allergies, current_medication, past_medication, chronic_disease, injuries, surgeries FROM     patient_medical WHERE aadhaar=?", (aadhaar,))
+        m = c.fetchone()
+        c.execute("SELECT smoking, alcohol, activity_level, food_preference, occupation FROM patient_lifestyle     WHERE aadhaar=?", (aadhaar,))
+        l = c.fetchone()
+        conn.close()
+        if not p:
+            show_popup("Error", "Patient data not found.")
+            return
+        # set edit mode
+        self.edit_mode = True
+        self.edit_aadhaar = aadhaar
+        # show page1 and then prefill fields after widgets created
+        self.load_page(1)
+        # we call prefill helper which uses instance widgets
+        # but widgets are only created when load_page called for those pages; we created page1 now
+        self.p_name.text = p[0] or ""
+        self.p_email.text = p[1] or ""
+        self.p_gender.text = p[2] or ""
+        self.p_dob.text = p[3] or ""
+        self.p_blood.text = p[4] or ""
+        self.p_marital.text = p[5] or ""
+        self.p_phone.text = p[6] or ""
+        self.p_location.text = p[7] or ""
+        self.p_password.text = p[8] or ""
+        # medical & lifestyle will fill when those pages are loaded; store temp
+        self._medical_prefill = m or ("", "", "", "", "", "")
+        self._lifestyle_prefill = l or ("", "", "", "", "")
 
-def prefill_fields_if_needed(self):
-    # When navigating to medical or lifestyle pages during edit, prefill
-    if self.page == 2 and hasattr(self, "_medical_prefill"):
-        self.m_allergies.text = self._medical_prefill[0] or ""
-        self.m_current.text = self._medical_prefill[1] or ""
-        self.m_past.text = self._medical_prefill[2] or ""
-        self.m_chronic.text = self._medical_prefill[3] or ""
-        self.m_injuries.text = self._medical_prefill[4] or ""
-        self.m_surgeries.text = self._medical_prefill[5] or ""
-    if self.page == 3 and hasattr(self, "_lifestyle_prefill"):
-        self.l_smoking.text = self._lifestyle_prefill[0] or ""
-        self.l_alcohol.text = self._lifestyle_prefill[1] or ""
-        self.l_activity.text = self._lifestyle_prefill[2] or ""
-        self.l_food.text = self._lifestyle_prefill[3] or ""
-        self.l_occupation.text = self._lifestyle_prefill[4] or ""
+    def prefill_fields_if_needed(self):
+        # When navigating to medical or lifestyle pages during edit, prefill
+        if self.page == 2 and hasattr(self, "_medical_prefill"):
+            self.m_allergies.text = self._medical_prefill[0] or ""
+            self.m_current.text = self._medical_prefill[1] or ""
+            self.m_past.text = self._medical_prefill[2] or ""
+            self.m_chronic.text = self._medical_prefill[3] or ""
+            self.m_injuries.text = self._medical_prefill[4] or ""
+            self.m_surgeries.text = self._medical_prefill[5] or ""
+        if self.page == 3 and hasattr(self, "_lifestyle_prefill"):
+            self.l_smoking.text = self._lifestyle_prefill[0] or ""
+            self.l_alcohol.text = self._lifestyle_prefill[1] or ""
+            self.l_activity.text = self._lifestyle_prefill[2] or ""
+            self.l_food.text = self._lifestyle_prefill[3] or ""
+            self.l_occupation.text = self._lifestyle_prefill[4] or ""
 
 
 # ----------------------- DOCTOR LIST & ADD / EDIT (Full screen single page) -----------------------
 class DoctorListScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.fields = ["Name", "Specialization", "Phone", "Aadhaar"]
+        self.fields = ["UserID", "Name", "Password", "Aadhaar", "Specialization"]
         self.build()
 
 
@@ -614,12 +694,15 @@ class DoctorListScreen(Screen):
         self.add_widget(main)
 
     def fetch_all_doctors_short(self):
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute("SELECT name, specialization, phone, aadhaar FROM doctor_info")
-        rows = c.fetchall()
-        conn.close()
-        return rows
+       conn = sqlite3.connect(DB_PATH)
+       c = conn.cursor()
+       c.execute("""
+        SELECT d.doctorid, d.name, d.password, d.aadhaar, d.specialization 
+        FROM doctor_info d
+       """)
+       rows = c.fetchall()
+       conn.close()
+       return rows
 
     def edit_doctor(self, index):
         rows = self.fetch_all_doctors_short()
@@ -700,6 +783,7 @@ class DoctorAddScreen(Screen):
 
 
     def save_doctor(self):
+        # 1. Gather values
         aadhaar = self.d_aadhaar.text.strip()
         name = self.d_name.text.strip()
         phone = self.d_phone.text.strip()
@@ -711,44 +795,71 @@ class DoctorAddScreen(Screen):
         email = self.d_email.text.strip()
         password = self.d_password.text.strip()
 
+        # 2. Validation
         if not aadhaar or not name or not password:
             show_popup("Error", "Aadhaar, Name and Password required.")
             return
 
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
+        
         try:
+            # ---------------- EDIT MODE (Existing Doctor) ----------------
             if self.edit_mode and self.edit_aadhaar:
+                # Update Doctor Info Table
                 c.execute("""
-                    UPDATE doctor_info SET name=?, phone=?, gender=?, specialization=?, qualification=?, experience=?, clinic=?, email=?, password=? WHERE aadhaar=?
+                    UPDATE doctor_info 
+                    SET name=?, phone=?, gender=?, specialization=?, qualification=?, experience=?, clinic=?, email=?, password=? 
+                    WHERE aadhaar=?
                 """, (name, phone, gender, special, qual, exp, clinic, email, password, self.edit_aadhaar))
-                c.execute("UPDATE users SET name=?, email=?, phone=?, password=?, role=? WHERE aadhaar=?",
-                          (name, email, phone, password, "Doctor", self.edit_aadhaar))
+                
+                # Update Users Table (Login Info)
+                c.execute("""
+                    UPDATE users 
+                    SET name=?, email=?, phone=?, password=?, role=? 
+                    WHERE aadhaar=?
+                """, (name, email, phone, password, "Doctor", self.edit_aadhaar))
+                
                 conn.commit()
                 show_popup("Success", "Doctor updated.")
+
+            # ---------------- INSERT MODE (New Doctor) ----------------
             else:
-                # check duplicate
+                # 1. Check Duplicate Aadhaar
                 c.execute("SELECT aadhaar FROM doctor_info WHERE aadhaar=?", (aadhaar,))
                 if c.fetchone():
                     show_popup("Error", "Aadhaar exists.")
                     conn.close()
                     return
+
+                # 2. Auto Generate New ID (e.g., THD-000001)
+                # Uses the new logic function
+                new_id = generate_new_id("Doctor")
+
+                # 3. Insert into Doctor Info Table
                 c.execute("""
-                    INSERT INTO doctor_info (aadhaar, name, phone, gender, specialization, qualification, experience, clinic, email, password)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (aadhaar, name, phone, gender, special, qual, exp, clinic, email, password))
-                # insert into users table
+                    INSERT INTO doctor_info (aadhaar, doctorid, name, phone, gender, specialization, qualification, experience, clinic, email, password)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (aadhaar, new_id, name, phone, gender, special, qual, exp, clinic, email, password))
+                
+                # 4. Insert into Users Table (For Login) - CRITICAL PART
+                # FIX: Using 'user_id' instead of 'userid' to match login file
                 c.execute("""
-                    INSERT OR REPLACE INTO users (name, email, aadhaar, phone, password, role)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                """, (name, email, aadhaar, phone, password, "Doctor"))
+                    INSERT INTO users (user_id, name, email, aadhaar, phone, password, role)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (new_id, name, email, aadhaar, phone, password, "Doctor"))
+                
                 conn.commit()
-                show_popup("Success", "Doctor added and login created.")
+                show_popup("Success", f"Doctor Added! ID: {new_id}")
+
             conn.close()
+            
+            # Reset and go back
             self.edit_mode = False
             self.edit_aadhaar = None
             self.manager.get_screen('doctor_list').build()
             self.manager.current = 'doctor_list'
+
         except sqlite3.IntegrityError as e:
             conn.close()
             show_popup("Error", f"DB error: {e}")
@@ -783,6 +894,119 @@ class DoctorAddScreen(Screen):
         self.d_email.text = r[7] or ""
         self.d_password.text = r[8] or ""
 
+# ----------------------- USER LIST SCREEN (NEW) -----------------------
+class UserListScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fields = ["UserID", "Name", "Password", "Phone", "Aadhaar"]
+        self.build()
+
+    def build(self):
+        self.clear_widgets()
+        main = BoxLayout(orientation="vertical", padding=10, spacing=8)
+        main.add_widget(Label(text="[b]User Management[/b]", markup=True, font_size=22, size_hint_y=None, height=50, color=(0,0,0,1)))
+
+        # search row
+        search_row = BoxLayout(size_hint_y=None, height=40, spacing=8)
+        self.search_input = TextInput(hint_text="Search by Aadhaar", multiline=False)
+        btn_search = Button(text="Search", size_hint_x=None, width=100)
+        btn_search.bind(on_release=lambda x: self.search_user())
+        btn_clear = Button(text="Clear", size_hint_x=None, width=100)
+        btn_clear.bind(on_release=lambda x: self.clear_search())
+        search_row.add_widget(self.search_input)
+        search_row.add_widget(btn_search)
+        search_row.add_widget(btn_clear)
+
+        # NO ADD BUTTON
+
+        scroll = ScrollView()
+        rows = self.fetch_all_users()
+        table = EditableTable(self.fields, rows, self.view_user, self.delete_user)
+        scroll.add_widget(table)
+
+        btn_back = Button(text="Back", size_hint_y=None, height=50)
+        btn_back.bind(on_release=lambda x: setattr(self.manager, "current", "home"))
+        
+        main.add_widget(search_row)
+        main.add_widget(scroll)
+        main.add_widget(btn_back)
+        self.add_widget(main)
+
+    def fetch_all_users(self):
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT user_id, name, password, phone, aadhaar FROM users WHERE user_id LIKE 'THU%' ORDER BY user_id")
+        rows = c.fetchall()
+        conn.close()
+        return rows
+
+    def search_user(self):
+        aadhaar = self.search_input.text.strip()
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT user_id, name, password, phone, aadhaar FROM users WHERE (user_id LIKE 'THU%') AND aadhaar=? ORDER BY user_id", (aadhaar,))
+        rows = c.fetchall()
+        conn.close()
+        self.rebuild_ui(rows, aadhaar)
+
+    def clear_search(self):
+        self.search_input.text = ""
+        self.build()
+
+    def rebuild_ui(self, rows, search_text):
+        self.clear_widgets()
+        # Same build logic as build() but with search results
+        main = BoxLayout(orientation="vertical", padding=10, spacing=8)
+        main.add_widget(Label(text="[b]User Management[/b]", markup=True, font_size=22, size_hint_y=None, height=50, color=(0,0,0,1)))
+        
+        search_row = BoxLayout(size_hint_y=None, height=40, spacing=8)
+        self.search_input = TextInput(text=search_text, multiline=False)
+        btn_search = Button(text="Search", size_hint_x=None, width=100)
+        btn_search.bind(on_release=lambda x: self.search_user())
+        btn_clear = Button(text="Clear", size_hint_x=None, width=100)
+        btn_clear.bind(on_release=lambda x: self.clear_search())
+        search_row.add_widget(self.search_input)
+        search_row.add_widget(btn_search)
+        search_row.add_widget(btn_clear)
+
+        scroll = ScrollView()
+        table = EditableTable(self.fields, rows, self.view_user, self.delete_user)
+        scroll.add_widget(table)
+
+        btn_back = Button(text="Back", size_hint_y=None, height=50)
+        btn_back.bind(on_release=lambda x: setattr(self.manager, "current", "home"))
+        
+        main.add_widget(search_row)
+        main.add_widget(scroll)
+        main.add_widget(btn_back)
+        self.add_widget(main)
+
+    def view_user(self, index):
+        rows = self.fetch_all_users()
+        show_popup("User Info", f"UserID: {rows[index][0]}\nName: {rows[index][1]}\nAadhaar: {rows[index][4]}")
+
+    def delete_user(self, index):
+        rows = self.fetch_all_users()
+        if index < 0 or index >= len(rows):
+            show_popup("Error", "Invalid index")
+            return
+        user_id_val = rows[index][0]
+        aadhaar = rows[index][4]
+        
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        # Delete related records first
+        c.execute("DELETE FROM patient_personal WHERE aadhaar=?", (aadhaar,))
+        c.execute("DELETE FROM patient_medical WHERE aadhaar=?", (aadhaar,))
+        c.execute("DELETE FROM patient_lifestyle WHERE aadhaar=?", (aadhaar,))
+        c.execute("DELETE FROM doctor_info WHERE aadhaar=?", (aadhaar,))
+        c.execute("DELETE FROM users WHERE user_id=? OR aadhaar=?", (user_id_val, aadhaar))
+        conn.commit()
+        conn.close()
+        show_popup("Success", f"User {user_id_val} deleted.")
+        self.build()
+
+
 # ----------------------- APP MANAGER -----------------------
 class AdminApp(App):
     def build(self):
@@ -792,6 +1016,8 @@ class AdminApp(App):
         sm.add_widget(PatientAddScreen(name="patient_add"))
         sm.add_widget(DoctorListScreen(name="doctor_list"))
         sm.add_widget(DoctorAddScreen(name="doctor_add"))
+        sm.add_widget(UserListScreen(name="user_list"))
+
         return sm
 
 if __name__ == "__main__":

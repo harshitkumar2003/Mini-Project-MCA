@@ -163,7 +163,7 @@ class LabReportPopup(ModalView):
             
     def show_download_popup(self, title, message):
         # Simple popup utility for feedback
-        Popup(title=title, content=Label(text=message),
+        Popup(title=title, content=Label(text=message , color=(1,1,1,1)),
               size_hint=(0.7, 0.4)).open()
               
         # Close the report view after showing the download status

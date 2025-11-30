@@ -21,7 +21,8 @@ from screens.admin import (    #todo: admin panel for managing users
     PatientListScreen,
     PatientAddScreen,
     DoctorListScreen,
-    DoctorAddScreen
+    DoctorAddScreen,
+    UserListScreen
 )
 
 
@@ -96,6 +97,7 @@ class HealthcareApp(App):
         sm.add_widget(PatientAddScreen(name="patient_add"))
         sm.add_widget(DoctorListScreen(name="doctor_list"))
         sm.add_widget(DoctorAddScreen(name="doctor_add"))
+        sm.add_widget(UserListScreen(name="user_list"))
         
         # Store references to important screens
         self.dashboard = dashboard

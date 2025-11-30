@@ -223,4 +223,4 @@ class PatientDetailScreenWrapper(Screen):
         self.add_widget(layout)
         
     def go_to_doctor(self, instance):
-        self.manager.current = 'dashboard'
+        self.manager.current = 'doctor'

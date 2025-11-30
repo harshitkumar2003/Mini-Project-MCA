@@ -80,7 +80,7 @@ class LoginSignupScreen(Screen):
             # Store the parsed numerical part (e.g., '000001' or '1500')
             self.last_user_id = numeric_part if numeric_part.isdigit() else '15000'
         else:
-            self.last_user_id = '15000' # No users yet, start from 0 
+            self.last_user_id = '00000' # No users yet, start from 0 
 
 
     def create_users_table(self):
@@ -112,7 +112,7 @@ class LoginSignupScreen(Screen):
             
         current_num += 1
         
-        prefix = "UPTH" 
+        prefix = "THU" 
         new_id = f"{prefix}-{current_num:06d}"
         
         self.last_user_id = f"{current_num:06d}" # Store only the number for the next run
@@ -307,7 +307,22 @@ class LoginSignupScreen(Screen):
 
     #! OTP verification
     def verify_otp(self):
-        entered_otp = ''.join([self.ids[f'otp{i}'].text for i in range(1, 5)])
+        
+        
+        entered_otp_list = [self.ids[f'otp{i}'].text.strip() for i in range(1, 5)]
+        entered_otp = ''.join(entered_otp_list)
+        
+        # --- Check if OTP fields are empty ---
+        if not entered_otp or len(entered_otp) < 4:
+            self.show_popup("Error", "Please enter the complete 4-digit OTP.")
+            return
+        
+        # --- Check if a phone number was registered for reset ---
+        if not self.current_reset_phone:
+            self.show_popup("Error", "Please first enter your phone number and send OTP.")
+            return
+
+        # --- Check against the generated OTP ---
         if entered_otp == self.temp_otp:
             self.show_popup("Success", "OTP verified. Please reset your password.")
             self.screen_switch("reset_password_view")
@@ -348,9 +363,10 @@ class LoginSignupScreen(Screen):
         self.ids.login_views.current = target
 
     def show_popup(self, title, message):
-        Popup(title=title, content=Label(text=message),
+        content_label = Label(text=message, color=(1, 1, 1, 1))
+        Popup(title=title, content=content_label,
               size_hint=(0.6, 0.4)).open()
-    
+        
     def reset_fields(self):
         # Clear fields for Login view
         self.ids.user_id_input.text = ""
