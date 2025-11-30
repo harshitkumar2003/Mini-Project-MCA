@@ -41,116 +41,165 @@
         CommonHeader:
             title: "Admin Dashboard"
 
-        BoxLayout:
-            padding: dp(10)
-            spacing: dp(12)
-
+        ScrollView: 
+            # 1. MAIN CONTAINER (ScrollView ka ONE AND ONLY Child)
             BoxLayout:
                 orientation: "vertical"
-                padding: [dp(16), dp(8), dp(16), dp(16)]   # top padding reduced
+                padding: dp(10)
                 spacing: dp(12)
-                pos_hint: {"top": 1}   # shift layout upward
                 size_hint_y: None
                 height: self.minimum_height
 
-                Widget:
-                    size_hint_y: None
-                    height: dp(20)     # << yahi Welcome ke UPAR space banayega
-
-                Label:
-                    text: "[b]Welcome, Admin[/b]\nAdmin can add or delete Patient and doctor and click view for checking list."
-                    text_size: self.width, None 
-                    markup: True
-                    height: self.texture_size[1] + dp(20) 
-                    color: 0,0,0,1
-                    padding: dp(8), dp(20)
-                    canvas.after:
-                        Color:
-                            rgba: 0,0,0,0
-                        Rectangle:
-                            size: self.size
-                            pos: self.pos
-
-                Widget:
-                    size_hint_y: None
-                    height: dp(20)    # << yahi label ke niche space badhata hai
-
-                BoxLayout:
-                    orientation: "horizontal"
-                    size_hint_y: None
-                    height: dp(200)
-                    padding: dp(18)
-                    spacing: dp(10)
-                    size_hint_x: 1
-                    canvas.before:
-                        Color:
-                            rgba: .92, .96, 1, 1
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [18,]
-
-                    BoxLayout:
-                        orientation: "horizontal"
-                        spacing: dp(12)
-                        Label:
-                            text: "[b]Patients[/b]\nManage patient records"
-                            markup: True
-                            color: 0,0,0,1
-                        BoxLayout:
-                            size_hint_x: None
-                            width: dp(110)
-                            orientation: "vertical"
-                            spacing: dp(6)
-                            Button:
-                                text: "View"
-                                size_hint_y: None
-                                height: dp(36)
-                                on_release: app.root.current = "patient_list"
-                            Button:
-                                text: "Add"
-                                size_hint_y: None
-                                height: dp(36)
-                                on_release: app.root.current = "patient_add"
-
+                # 2. INNER CONTENT WRAPPER (Ab ye Main Container ke andar hai)
                 BoxLayout:
                     orientation: "vertical"
+                    padding: [dp(16), dp(8), dp(16), dp(16)]
+                    spacing: dp(12)
+                    pos_hint: {"top": 1}
                     size_hint_y: None
-                    height: dp(200)
-                    padding: dp(18)
-                    spacing: dp(10)
-                    size_hint_x: 1
-                    canvas.before:
-                        Color:
-                            rgba: .92, 1, .94, 1
-                        RoundedRectangle:
-                            pos: self.pos
-                            size: self.size
-                            radius: [12,]
+                    height: self.minimum_height
 
+                    Widget:
+                        size_hint_y: None
+                        height: dp(20)
+
+                    Label:
+                        text: "[b]Welcome, Admin[/b]\nAdmin can add or delete Patient and doctor and click view for checking list."
+                        text_size: self.width, None 
+                        markup: True
+                        height: self.texture_size[1] + dp(20) 
+                        color: 0,0,0,1
+                        padding: dp(8), dp(20)
+                        canvas.after:
+                            Color:
+                                rgba: 0,0,0,0
+                            Rectangle:
+                                size: self.size
+                                pos: self.pos
+
+                    Widget:
+                        size_hint_y: None
+                        height: dp(20)
+
+                    # --- PATIENT CARD ---
                     BoxLayout:
                         orientation: "horizontal"
-                        spacing: dp(12)
+                        size_hint_y: None
+                        height: dp(200)
+                        padding: dp(18)
+                        spacing: dp(10)
+                        size_hint_x: 1
+                        canvas.before:
+                            Color:
+                                rgba: .92, .96, 1, 1
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [18,]
+
+                        BoxLayout:
+                            orientation: "horizontal"
+                            spacing: dp(12)
+                            Label:
+                                text: "[b]Patients[/b]\nManage patient records"
+                                markup: True
+                                color: 0,0,0,1
+                            BoxLayout:
+                                size_hint_x: None
+                                width: dp(110)
+                                orientation: "vertical"
+                                spacing: dp(6)
+                                Button:
+                                    text: "View"
+                                    color: 1,1,1,1
+                                    size_hint_y: None
+                                    height: dp(36)
+                                    on_release: app.root.current = "patient_list"
+                                Button:
+                                    text: "Add"
+                                    color: 1,1,1,1
+                                    size_hint_y: None
+                                    height: dp(36)
+                                    on_release: app.root.current = "patient_add"
+
+                    # --- DOCTOR CARD ---
+                    BoxLayout:
+                        orientation: "vertical"
+                        size_hint_y: None
+                        height: dp(200)
+                        padding: dp(18)
+                        spacing: dp(10)
+                        size_hint_x: 1
+                        canvas.before:
+                            Color:
+                                rgba: .92, 1, .94, 1
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [12,]
+
+                        BoxLayout:
+                            orientation: "horizontal"
+                            spacing: dp(12)
+                            Label:
+                                text: "[b]Doctors[/b]\nManage doctor profiles"
+                                markup: True
+                                color: 0,0,0,1
+                            BoxLayout:
+                                size_hint_x: None
+                                width: dp(110)
+                                orientation: "vertical"
+                                spacing: dp(6)
+                                Button:
+                                    text: "View"
+                                    color: 1,1,1,1
+                                    size_hint_y: None
+                                    height: dp(36)
+                                    on_release: app.root.current = "doctor_list"
+                                Button:
+                                    text: "Add"
+                                    color: 1,1,1,1
+                                    size_hint_y: None
+                                    height: dp(36)
+                                    on_release: app.root.current = "doctor_add"
+                    
+                    # --- USER MANAGEMENT CARD (Indented correctly inside Inner Wrapper) ---
+                    BoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(180)
+                        padding: dp(18)
+                        spacing: dp(10)
+                        canvas.before:
+                            Color:
+                                rgba: 1, .95, .90, 1  # Light Orange
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [18,]
+
                         Label:
-                            text: "[b]Doctors[/b]\nManage doctor profiles"
+                            text: "[b]User Management[/b]\nView Login Data (IDs)"
                             markup: True
                             color: 0,0,0,1
+                            text_size: self.width, None
+                            halign: 'left'
+                            valign: 'center'
+
                         BoxLayout:
                             size_hint_x: None
                             width: dp(110)
                             orientation: "vertical"
                             spacing: dp(6)
+                            pos_hint: {'center_y': 0.5}
+                            
                             Button:
-                                text: "View"
+                                text: "View Users"
                                 size_hint_y: None
                                 height: dp(36)
-                                on_release: app.root.current = "doctor_list"
-                            Button:
-                                text: "Add"
-                                size_hint_y: None
-                                height: dp(36)
-                                on_release: app.root.current = "doctor_add"
-
+                                color: 1,1,1,1
+                                background_color: 1, 0.6, 0.4, 1
+                                on_release: app.root.current = "user_list"
         
 # ---------------- Patient List Screen ----------------
 <PatientListScreen>:
@@ -182,11 +231,13 @@
                     multiline: False
                 Button:
                     text: "Search"
+                    color: 1,1,1,1
                     size_hint_x: None
                     width: dp(100)
                     on_release: root.search_patient()
                 Button:
                     text: "Clear"
+                    color: 1,1,1,1
                     size_hint_x: None
                     width: dp(100)
                     on_release: root.clear_search()
@@ -208,6 +259,7 @@
                     on_release: app.root.current = "patient_add"
                 Button:
                     text: "Back"
+                    color: 1,1,1,1
                     on_release: app.root.current = "admin_home"
 
 # ---------------- Patient Add / Edit Screen ----------------
@@ -247,14 +299,17 @@
                 spacing: dp(8)
                 Button:
                     text: "Previous"
+                    color: 1,1,1,1
                     on_release: root.prev_page()
                     disabled: root.page <= 1
                 Button:
                     id: next_btn
+                    color: 1,1,1,1
                     text: root.page < 3 and "Next" or "Save"
                     on_release: root.next_page()
                 Button:
                     text: "Cancel"
+                    color: 1,1,1,1
                     on_release: root.cancel()
 
 # ---------------- Doctor List Screen ----------------
@@ -290,9 +345,11 @@
                 spacing: dp(8)
                 Button:
                     text: "Add New Doctor"
+                    color: 1,1,1,1
                     on_release: app.root.current = "doctor_add"
                 Button:
                     text: "Back"
+                    color: 1,1,1,1
                     on_release: app.root.current = "admin_home"
 
 # ---------------- Doctor Add / Edit Screen ----------------
@@ -319,7 +376,7 @@
                 height: self.minimum_height
 
                 Label:
-                    text: "Doctor form will appear here (Python inserts widgets)"
+                    text: "Doctor form will appear here"
                     size_hint_y: None
                     height: dp(120)
 
@@ -329,7 +386,9 @@
             spacing: dp(8)
             Button:
                 text: "Save"
+                color: 1,1,1,1
                 on_release: root.save_doctor()
             Button:
                 text: "Cancel"
+                color: 1,1,1,1
                 on_release: root.cancel()
