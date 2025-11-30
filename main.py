@@ -13,7 +13,7 @@ from screens.login import LoginSignupScreen        #todo: login and signup funct
 from screens.dashboard import HomeDashboardScreen  #todo: user dashboard after login
 from screens.landing import LandingScreen          #todo: import landing screen
 from screens.patient import PatientDashboard
-#from screens.doctor import DoctorDashboard
+from screens.doctor import DoctorDashboard, PatientDetailScreenWrapper
 
 #! import admin screens
 from screens.admin import (    #todo: admin panel for managing users
@@ -41,7 +41,7 @@ Builder.load_file("kv/dashboard.kv")
 Builder.load_file("kv/landing.kv")
 Builder.load_file("kv/admin.kv")
 Builder.load_file("kv/patient.kv")
-#Builder.load_file("kv/doctor.kv")
+Builder.load_file("kv/doctor.kv")
 
 
 
@@ -57,7 +57,13 @@ class HealthcareApp(App):
         sm.add_widget(LoginSignupScreen(name="login"))
         sm.add_widget(HomeDashboardScreen(name="dashboard"))
         sm.add_widget(PatientDashboard(name="patient"))     
-        #sm.add_widget(DoctorDashboard(name="doctor"))
+        sm.add_widget(DoctorDashboard(name="doctor"))
+        patient_content = PatientDashboard()
+        patient_details_screen = PatientDetailScreenWrapper(
+        name="patient_details_screen",
+        dashboard_content=patient_content
+        )
+        sm.add_widget(patient_details_screen)
 
 
         #! Admin Screens (Danger Zone) - Access only for Admin Role -> 

@@ -26,12 +26,12 @@ except ImportError:
     MeshLinePlot = None
 
 # --- LOAD KV FILE ---
-if __name__ != '__main__':
-    if os.path.exists('kv/patient.kv'):
-        Builder.load_file('kv/patient.kv')
-else:
-    if os.path.exists('kv/patient.kv'):
-        Builder.load_file('kv/patient.kv')
+#if __name__ != '__main__':
+#    if os.path.exists('kv/patient.kv'):
+#        Builder.load_file('kv/patient.kv')
+#else:
+#    if os.path.exists('kv/patient.kv'):
+#        Builder.load_file('kv/patient.kv')
 
 class RoundedBoxLayout(BoxLayout):
     background_color = ColorProperty([1, 1, 1, 1])
@@ -205,11 +205,3 @@ class PatientDashboard(Screen):
                         sub_widget.patient_name = name_text
                         print(f"Updated Patient Dashboard to: {name_text}")
                         return
-
-class PatientDashboardApp(App):
-    def build(self):
-        Window.size = (400, 800)
-        return PatientDashboard()
-
-if __name__ == '__main__':
-    PatientDashboardApp().run()

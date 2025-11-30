@@ -2,7 +2,6 @@ import kivy
 import random
 import os
 from kivy.app import App
-from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -15,8 +14,6 @@ from kivy.metrics import dp
 from functools import partial
 from kivy.uix.screenmanager import Screen
 
-# --- IMPORT THE PATIENT DASHBOARD ---
-from patient import DashboardRoot
 
 # --- Import Graph Components ---
 try:
@@ -26,12 +23,6 @@ except ImportError:
     Graph = None
     MeshLinePlot = None
 
-Window.size = (400, 750)
-Window.clearcolor = (1, 1, 1, 1)
-
-# --- Load the Doctor KV file ---
-if os.path.exists('kv/doctor.kv'):
-    Builder.load_file('kv/doctor.kv')
 
 # --- POPUP CLASSES ---
 class AlertsPopup(ModalView):
@@ -162,9 +153,11 @@ class DoctorDashboard(Screen):
 
     def view_patient_report(self, patient_name, instance):
         print(f"Selecting: {patient_name}")
-        app = App.get_running_app()
-        if hasattr(app, 'patient_content'):
-            app.patient_content.update_patient_info(patient_name)
+        # yahan se current ScreenManager se patient_details_screen lo
+        patient_screen = self.manager.get_screen("patient_details_screen")
+        # uske andar PatientDashboard ka instance kv se hona chahiye (neeche explain kar rha hoon)
+        if hasattr(patient_screen, "patient_content"):
+            patient_screen.patient_content.update_patient_info(patient_name)
         self.manager.current = "patient_details_screen"
 
     def update_graph(self, dt):
@@ -181,6 +174,7 @@ class DoctorDashboard(Screen):
 class PatientDetailScreenWrapper(Screen):
     def __init__(self, dashboard_content, **kwargs):
         super().__init__(**kwargs)
+        self.patient_content = dashboard_content  
         layout = BoxLayout(orientation='vertical')
         
         # Top Nav
@@ -206,20 +200,3 @@ class PatientDetailScreenWrapper(Screen):
         
     def go_to_doctor(self, instance):
         self.manager.current = 'dashboard'
-
-class DoctorApp(App):
-    def build(self):
-        sm = ScreenManager()
-        doctor_screen = DoctorDashboard(name='dashboard')
-        sm.add_widget(doctor_screen)
-        
-        self.patient_content = DashboardRoot() 
-        patient_screen = PatientDetailScreenWrapper(
-            name='patient_details_screen',
-            dashboard_content=self.patient_content
-        )
-        sm.add_widget(patient_screen)
-        return sm
-
-if __name__ == '__main__':
-    DoctorApp().run()
