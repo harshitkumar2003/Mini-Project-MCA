@@ -1,0 +1,89 @@
+<DiseaseInfo>:
+    orientation: 'vertical'
+    spacing: 8
+    padding: 15
+    size_hint_y: None
+    height: 240
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [15,]
+        Color:
+            rgba: 0.95, 0.97, 1, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [15,]
+        Color:
+            rgba: 0.2, 0.6, 0.4, 0.1
+        Line:
+            rounded_rectangle: [self.x, self.y, self.width, self.height, 15]
+            width: 1.5
+
+    Label:
+        text: root.name
+        font_size: '18sp'
+        bold: True
+        size_hint_y: None
+        height: 30
+        text_size: self.width, None
+        halign: 'left'
+        valign: 'middle'
+        color: 0.1, 0.1, 0.1, 1
+
+    BoxLabel:
+        title: 'Symptoms:'
+        value: root.symptoms
+        height: 50
+    
+    BoxLabel:
+        title: 'Specialist:'
+        value: root.doctor.replace('Recommended Specialist: ', '')
+        height: 30
+        value_color: 0.2, 0.6, 0.4, 1
+    
+    BoxLabel:
+        title: 'Medication:'
+        value: root.medication.replace('Medications: ', '')
+        height: 50
+    
+    BoxLabel:
+        title: 'Advice:'
+        value: root.advice
+        height: 50
+        title_font_size: '12sp'
+        value_font_size: '12sp'
+
+<BoxLabel@BoxLayout>:
+    title: ''
+    value: ''
+    title_font_size: '14sp'
+    value_font_size: '14sp'
+    title_color: 0.4, 0.4, 0.4, 1
+    value_color: 0.2, 0.2, 0.2, 1
+    spacing: 5
+    size_hint_y: None
+    height: 30
+    
+    Label:
+        text: root.title
+        font_size: root.title_font_size
+        size_hint_x: 0.35
+        color: root.title_color
+        halign: 'left'
+        valign: 'middle'
+        text_size: self.size
+    
+    Label:
+        text: root.value
+        font_size: root.value_font_size
+        size_hint_x: 0.65
+        color: root.value_color
+        halign: 'left'
+        valign: 'middle'
+        text_size: self.width, None
+        size: self.texture_size
+        text_size: self.width, None

@@ -1,12 +1,13 @@
 <HomeDashboardScreen>:
     BoxLayout:
         orientation: 'vertical'
+        spacing: 10
+        padding: [10, 10, 10, 0]
 
+        # Top Bar
         BoxLayout:
             size_hint_y: None
             height: 60
-            padding: 10
-            spacing: 10
             canvas.before:
                 Color:
                     rgba: 0.2, 0.6, 0.4, 1  # Green top bar
@@ -38,82 +39,123 @@
                     app.root.get_screen('login').reset_fields()
                     app.root.current = 'login'
 
+        # Main Content Area
         ScrollView:
             do_scroll_x: False
+            bar_width: 10
+            bar_color: 0.5, 0.5, 0.5, 0.5
+            bar_inactive_color: 0.5, 0.5, 0.5, 0.3
+            effect_cls: 'ScrollEffect'
 
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                padding: 16
-                spacing: 16
+                padding: [16, 10, 16, 30]
+                spacing: 20
 
-                # First row of cards
-                BoxLayout:
+                # Top Cards Row
+                GridLayout:
+                    cols: 3
                     spacing: 15
                     size_hint_y: None
-                    height: 180
+                    height: 200
+                    padding: [0, 0, 0, 10]
 
                     InfoCard:
                         id: appointments_card
                         title: "Appointments"
-                        value: "5"
+                        value: "0"
                         icon_source: "assets/calendar.jpg"
-                        size_hint: None, None
-                        width: self.parent.width / 3 - 15
-                        height: 180
-
-                    InfoCard:
-                        id: reports_card
-                        title: "Medical History"
-                        value: "12"
-                        icon_source: "assets/report.png"
-                        size_hint: None, None
-                        width: self.parent.width / 3 - 15
-                        height: 180
-
-                    InfoCard:
-                        id: doctors_card
-                        title: "Doctors"
-                        value: "7"
-                        icon_source: "assets/doctor.png"
-                        size_hint: None, None
-                        width: self.parent.width / 3 - 15
-                        height: 180
-
-                # Second row of cards
-                BoxLayout:
-                    spacing: 15
-                    size_hint_y: None
-                    height: 180
-
+                        action: root.show_appointment_popup
+                        canvas.before:
+                            Color:
+                                rgba: 0.9, 0.95, 1, 1
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [15,]
+                        
                     InfoCard:
                         id: symptoms_card
-                        title: "Symptoms"
-                        value: "8"
+                        title: "Symptom Tracker"
+                        value: "Track"
                         icon_source: "assets/symptoms.png"
-                        size_hint: None, None
-                        width: self.parent.width / 3 - 15
-                        height: 180
-
+                        action: root.show_symptom_tracker
+                        canvas.before:
+                            Color:
+                                rgba: 0.95, 0.95, 1, 1
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [15,]
+                        
                     InfoCard:
-                        id: medicines_card
-                        title: "Medicines"
-                        value: "15"
-                        icon_source: "assets/medicines.png"
-                        size_hint: None, None
-                        width: self.parent.width / 3 - 15
-                        height: 180
+                        id: doctors_card
+                        title: "Find Doctors"
+                        value: '8'  # Total number of doctors
+                        icon_source: "assets/doctor.png"
+                        action: root.show_doctor_list
+                        canvas.before:
+                            Color:
+                                rgba: 0.9, 1, 0.95, 1
+                            RoundedRectangle:
+                                pos: self.pos
+                                size: self.size
+                                radius: [15,]
 
-                    InfoCard:
-                        id: diseases_card
-                        title: "Diseases"
-                        value: "3"
-                        icon_source: "assets/disease.png"
-                        size_hint: None, None
-                        width: self.parent.width / 3 - 15
-                        height: 180
+                # Doctors Section
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: 320
+                    spacing: 10
+                    padding: [0, 10, 0, 0]
 
+                    BoxLayout:
+                        size_hint_y: None
+                        height: 40
+                        spacing: 10
+                        
+                        Label:
+                            text: "Available Doctors"
+                            font_size: 18
+                            bold: True
+                            size_hint_x: 0.7
+                            color: 0.2, 0.2, 0.2, 1
+                            halign: 'left'
+                            valign: 'middle'
+                            text_size: self.size
+                            
+                        Button:
+                            text: "View All"
+                            size_hint_x: 0.3
+                            background_color: 0.2, 0.6, 0.4, 1
+                            color: 1, 1, 1, 1
+                            on_release: root.show_doctor_list()
+                    
+                    # Doctors Horizontal Scroll
+                    ScrollView:
+                        size_hint_y: 0.9
+                        do_scroll_x: True
+                        do_scroll_y: False
+                        bar_width: 8
+                        bar_color: 0.5, 0.5, 0.5, 0.5
+                        bar_inactive_color: 0.5, 0.5, 0.5, 0.3
+                        
+                        GridLayout:
+                            id: doctors_container
+                            cols: 20
+                            spacing: 15
+                            size_hint_x: None
+                            width: self.minimum_width
+                            size_hint_y: 1
+                            row_force_default: True
+                            padding: [10, 5, 10, 10]
+                            row_default_height: 220
+                            col_force_default: True
+                            col_default_width: 180
+                
                 # Health Overview Section
                 BoxLayout:
                     orientation: 'vertical'
@@ -124,16 +166,19 @@
 
                     Label:
                         text: "Health Overview"
-                        font_size: 20
+                        font_size: 18
                         bold: True
                         size_hint_y: None
                         height: 40
                         color: 0.2, 0.2, 0.2, 1
+                        halign: 'left'
+                        valign: 'middle'
+                        text_size: self.size
 
                     BoxLayout:
                         size_hint_y: None
                         height: 350
-                        spacing: 10
+                        spacing: 15
 
                         # Left side - Graph
                         BoxLayout:
@@ -145,8 +190,15 @@
                                 RoundedRectangle:
                                     pos: self.pos
                                     size: self.size
-                                    radius: [10,]
-                            padding: 10
+                                    radius: [15,]
+                                    source: 'assets/card_bg.png'
+                                Color:
+                                    rgba: 0, 0, 0, 0.03
+                                RoundedRectangle:
+                                    pos: self.pos
+                                    size: self.size
+                                    radius: [15,]
+                            padding: 15
 
                             Graph:
                                 id: health_graph
@@ -163,13 +215,15 @@
                                 xmax: 30
                                 ymin: 0
                                 ymax: 100
+                                x_grid_color: 0.9, 0.9, 0.9, 1
+                                y_grid_color: 0.9, 0.9, 0.9, 1
                                 label_options: {'color': [0.4,0.4,0.4,1]}
 
                         # Right side - Health Stats
                         BoxLayout:
                             orientation: 'vertical'
                             size_hint: 0.3, 1
-                            spacing: 10
+                            spacing: 15
 
                             # Health Metrics Card
                             BoxLayout:
@@ -177,12 +231,19 @@
                                 size_hint: 1, 0.5
                                 canvas.before:
                                     Color:
-                                        rgba: 0.95, 0.95, 0.95, 1
+                                        rgba: 1, 1, 1, 1
                                     RoundedRectangle:
                                         pos: self.pos
                                         size: self.size
-                                        radius: [10,]
-                                padding: 10
+                                        radius: [15,]
+                                        source: 'assets/card_bg.png'
+                                    Color:
+                                        rgba: 0.95, 0.97, 1, 1
+                                    RoundedRectangle:
+                                        pos: self.pos
+                                        size: self.size
+                                        radius: [15,]
+                                padding: 15
 
                                 Label:
                                     text: "Health Metrics"
@@ -191,14 +252,81 @@
                                     size_hint_y: None
                                     height: 30
                                     color: 0.2, 0.2, 0.2, 1
+                                    halign: 'left'
+                                    text_size: self.size
 
                                 BoxLayout:
                                     orientation: 'vertical'
-                                    Label:
-                                        text: "Heart Rate: 72 bpm"
-                                        font_size: 14
-                                        color: 0.4, 0.4, 0.4, 1
-                                        halign: 'left'
+                                    spacing: 8
+                                    padding: [0, 10, 0, 0]
+                                    
+                                    BoxLayout:
+                                        size_hint_y: None
+                                        height: 30
+                                        Label:
+                                            text: "Heart Rate"
+                                            color: 0.5, 0.5, 0.5, 1
+                                            size_hint_x: 0.6
+                                            halign: 'left'
+                                            text_size: self.size
+                                        Label:
+                                            text: "72 bpm"
+                                            color: 0.2, 0.6, 0.4, 1
+                                            bold: True
+                                            size_hint_x: 0.4
+                                            halign: 'right'
+                                            text_size: self.size
+                                    
+                                    BoxLayout:
+                                        size_hint_y: None
+                                        height: 30
+                                        Label:
+                                            text: "Blood Pressure"
+                                            color: 0.5, 0.5, 0.5, 1
+                                            size_hint_x: 0.6
+                                            halign: 'left'
+                                            text_size: self.size
+                                        Label:
+                                            text: "120/80 mmHg"
+                                            color: 0.2, 0.6, 0.4, 1
+                                            bold: True
+                                            size_hint_x: 0.4
+                                            halign: 'right'
+                                            text_size: self.size
+                                    
+                                    BoxLayout:
+                                        size_hint_y: None
+                                        height: 30
+                                        Label:
+                                            text: "Oxygen Level"
+                                            color: 0.5, 0.5, 0.5, 1
+                                            size_hint_x: 0.6
+                                            halign: 'left'
+                                            text_size: self.size
+                                        Label:
+                                            text: "98%"
+                                            color: 0.2, 0.6, 0.4, 1
+                                            bold: True
+                                            size_hint_x: 0.4
+                                            halign: 'right'
+                                            text_size: self.size
+                                    
+                                    BoxLayout:
+                                        size_hint_y: None
+                                        height: 30
+                                        Label:
+                                            text: "Temperature"
+                                            color: 0.5, 0.5, 0.5, 1
+                                            size_hint_x: 0.6
+                                            halign: 'left'
+                                            text_size: self.size
+                                        Label:
+                                            text: "98.6°F"
+                                            color: 0.2, 0.6, 0.4, 1
+                                            bold: True
+                                            size_hint_x: 0.4
+                                            halign: 'right'
+                                            text_size: self.size
                                     Label:
                                         text: "Blood Pressure: 120/80"
                                         font_size: 14
@@ -249,18 +377,21 @@
                                             icon: "assets/exercise.png"
                                             text: "30 min walk - 7:00 AM"
 
-<InfoCard@BoxLayout>:
-    value: ''         # property declarations to avoid attribute errors
+<InfoCard>:
+    value: ''
     title: ''
     icon_source: ''
-    orientation: 'vertical'
-    padding: 12
-    size_hint: None, None
-    height: 180
-    width: 120
+    action: None
+    
     canvas.before:
         Color:
-            rgba: 0.9, 0.97, 0.95, 1
+            rgba: 1, 1, 1, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [15,]
+        Color:
+            rgba: 0.95, 0.97, 1, 1
         RoundedRectangle:
             pos: self.pos
             size: self.size
@@ -270,11 +401,16 @@
         Line:
             rounded_rectangle: (self.x, self.y, self.width, self.height, 12)
             width: 1.5
+    
+    orientation: 'vertical'
 
     BoxLayout:
         size_hint_y: None
         height: 60
         padding: [0, 0, 0, 5]
+        pos_hint: {'center_x': 0.5}
+        size_hint_x: None
+        width: 50
         Image:
             source: root.icon_source
             size_hint: None, None
@@ -282,6 +418,7 @@
             width: 50
             allow_stretch: True
             mipmap: True
+            pos_hint: {'center_x': 0.5}
 
     Label:
         text: root.title

@@ -152,13 +152,37 @@ class DoctorDashboard(Screen):
         popup.open()
 
     def view_patient_report(self, patient_name, instance):
-        print(f"Selecting: {patient_name}")
-        # yahan se current ScreenManager se patient_details_screen lo
-        patient_screen = self.manager.get_screen("patient_details_screen")
-        # uske andar PatientDashboard ka instance kv se hona chahiye (neeche explain kar rha hoon)
-        if hasattr(patient_screen, "patient_content"):
-            patient_screen.patient_content.update_patient_info(patient_name)
-        self.manager.current = "patient_details_screen"
+        # This method will be called when the 'View Report' button is clicked
+        app = App.get_running_app()
+        
+        # Create a new patient detail view
+        from kivy.uix.boxlayout import BoxLayout
+        from kivy.uix.label import Label
+        
+        # Create a simple patient detail view
+        detail_content = BoxLayout(orientation='vertical', padding=20, spacing=10)
+        detail_content.add_widget(Label(
+            text=f'Patient: {patient_name}',
+            font_size=24,
+            size_hint_y=None,
+            height=50,
+            color=(0, 0, 0, 1)
+        ))
+        
+        # Add more patient details here as needed
+        detail_content.add_widget(Label(
+            text='Medical History: [Sample Data]',
+            font_size=16,
+            color=(0.3, 0.3, 0.3, 1)
+        ))
+        
+        # Update the patient detail screen
+        if hasattr(app, 'patient_detail_screen'):
+            app.patient_detail_screen.clear_widgets()
+            app.patient_detail_screen.add_widget(detail_content)
+            
+            # Switch to the patient detail screen
+            app.root.current = 'patient_detail'
 
     def update_graph(self, dt):
         if not hasattr(self, 'plot'): return

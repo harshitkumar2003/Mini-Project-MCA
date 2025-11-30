@@ -51,28 +51,56 @@ Window.clearcolor = get_color_from_hex("#ffffff")
 #! Screen Manager
 class HealthcareApp(App):
     def build(self):
+        # Create the screen manager
         sm = ScreenManager(transition=FadeTransition())
-        sm.add_widget(SplashScreen(name="splash"))
-        sm.add_widget(LandingScreen(name="landing"))
-        sm.add_widget(LoginSignupScreen(name="login"))
-        sm.add_widget(HomeDashboardScreen(name="dashboard"))
-        sm.add_widget(PatientDashboard(name="patient"))     
-        sm.add_widget(DoctorDashboard(name="doctor"))
-        patient_content = PatientDashboard()
-        patient_details_screen = PatientDetailScreenWrapper(
-        name="patient_details_screen",
-        dashboard_content=patient_content
-        )
-        sm.add_widget(patient_details_screen)
-
-
-        #! Admin Screens (Danger Zone) - Access only for Admin Role -> 
-        sm.add_widget(HomeScreen(name="admin"))
+        
+        # Add screens
+        sm.add_widget(SplashScreen(name='splash'))
+        sm.add_widget(LandingScreen(name='landing'))
+        
+        # Initialize login screen first
+        login_screen = LoginSignupScreen(name='login')
+        sm.add_widget(login_screen)
+        
+        # Initialize dashboard screens
+        dashboard = HomeDashboardScreen(name='dashboard')
+        sm.add_widget(dashboard)
+        
+        # Initialize other screens
+        sm.add_widget(PatientDashboard(name='patient_dashboard'))
+        sm.add_widget(DoctorDashboard(name='doctor_dashboard'))
+        
+        # Create a placeholder for patient detail content
+        from kivy.uix.label import Label
+        placeholder_content = Label(text='Select a patient to view details',
+                                 font_size=20,
+                                 color=(0.5, 0.5, 0.5, 1))
+        
+        # Initialize the patient detail wrapper with the placeholder content
+        sm.add_widget(PatientDetailScreenWrapper(
+            name='patient_detail',
+            dashboard_content=placeholder_content
+        ))
+        
+        # Store reference to the patient detail screen for later updates
+        self.patient_detail_screen = sm.get_screen('patient_detail')
+        
+        # Add admin screens
+        sm.add_widget(HomeScreen(name='admin_home'))
+        sm.add_widget(PatientListScreen(name='admin_patient_list'))
+        sm.add_widget(PatientAddScreen(name='admin_patient_add'))
+        sm.add_widget(DoctorListScreen(name='admin_doctor_list'))
+        sm.add_widget(DoctorAddScreen(name='admin_doctor_add'))
         sm.add_widget(HomeScreen(name="home"))
         sm.add_widget(PatientListScreen(name="patient_list"))
         sm.add_widget(PatientAddScreen(name="patient_add"))
         sm.add_widget(DoctorListScreen(name="doctor_list"))
         sm.add_widget(DoctorAddScreen(name="doctor_add"))
+        
+        # Store references to important screens
+        self.dashboard = dashboard
+        self.login_screen = login_screen
+        
         sm.current = "splash"
         return sm
 

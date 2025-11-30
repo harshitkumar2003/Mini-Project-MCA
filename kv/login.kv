@@ -239,15 +239,54 @@
                                 bold: True
                                 on_release: root.validate_signup()
 
+                            # Modern Back Button with Icon
                             Button:
-                                text: "← Back"
-                                size_hint_y: None
-                                height: 40
+                                text: "  Back to Login"
+                                size_hint: 1, None
+                                height: 48
                                 background_normal: ""
-                                background_color: 0, 0, 0, 0
-                                color: 0.18, 0.34, 0.82, 1
-                                font_size: 18
-                                on_release: root.screen_switch("login_view")
+                                background_color: 0.96, 0.96, 0.98, 1
+                                background_down: ""
+                                color: 0.2, 0.6, 0.4, 1
+                                font_size: '16sp'
+                                # Using system default font with fallback
+                                bold: True
+                                on_release: root.ids.login_views.current = 'login_view'
+                                canvas.before:
+                                    Color:
+                                        rgba: (0.2, 0.6, 0.4, 0.1) if self.state == 'normal' else (0.2, 0.6, 0.4, 0.2)
+                                    RoundedRectangle:
+                                        size: self.size
+                                        pos: self.pos
+                                        radius: [8, 8, 8, 8]
+                                canvas.after:
+                                    Color:
+                                        rgba: 0.2, 0.6, 0.4, 1
+                                    Line:
+                                        rounded_rectangle: [self.x, self.y, self.width, self.height, 8]
+                                        width: 1.5
+                                    Triangle:
+                                        points: [self.x + 10, self.y + self.height/2 + 4, self.x + 20, self.y + self.height/2 - 6, self.x + 20, self.y + self.height/2 + 14]
+                                        
+                                # Add left arrow icon using unicode
+                                Label:
+                                    text: "←"  # Standard left arrow
+                                    # Using default font for Material Icons
+                                    # Make sure the font file exists at the specified path
+                                    font_size: '24sp'
+                                    color: 0.2, 0.6, 0.4, 1
+                                    size_hint: None, None
+                                    size: 24, 24
+                                    pos_hint: {'center_y': 0.5}
+                                    x: self.parent.x + 15
+                                    canvas.before:
+                                        PushMatrix
+                                        Scale:
+                                            x: -1 if self.parent.state == 'down' else 1
+                                            y: 1
+                                            origin: self.center
+                                    canvas.after:
+                                        PopMatrix
 
                 # -----------------------------------------------------
                 # 3. Forgot Password View (OTP Request via Phone)
@@ -375,15 +414,54 @@
                                 bold: True
                                 on_release: root.verify_otp()
 
+                            # Modern Back Button with Icon
                             Button:
-                                text: "← Back"
-                                size_hint_y: None
-                                height: 40
+                                text: "  Back to Login"
+                                size_hint: 1, None
+                                height: 48
                                 background_normal: ""
-                                background_color: 0, 0, 0, 0
-                                color: 0.18, 0.34, 0.82, 1
-                                font_size: 17
+                                background_color: 0.96, 0.96, 0.98, 1
+                                background_down: ""
+                                color: 0.2, 0.6, 0.4, 1
+                                font_size: '16sp'
+                                # Using system default font with fallback
+                                bold: True
                                 on_release: root.screen_switch("login_view")
+                                canvas.before:
+                                    Color:
+                                        rgba: (0.2, 0.6, 0.4, 0.1) if self.state == 'normal' else (0.2, 0.6, 0.4, 0.2)
+                                    RoundedRectangle:
+                                        size: self.size
+                                        pos: self.pos
+                                        radius: [8, 8, 8, 8]
+                                canvas.after:
+                                    Color:
+                                        rgba: 0.2, 0.6, 0.4, 1
+                                    Line:
+                                        rounded_rectangle: [self.x, self.y, self.width, self.height, 8]
+                                        width: 1.5
+                                    Triangle:
+                                        points: [self.x + 10, self.y + self.height/2 + 4, self.x + 20, self.y + self.height/2 - 6, self.x + 20, self.y + self.height/2 + 14]
+                                        
+                                # Add left arrow icon using unicode
+                                Label:
+                                    text: "←"  # Standard left arrow
+                                    # Using default font for Material Icons
+                                    # Make sure the font file exists at the specified path
+                                    font_size: '24sp'
+                                    color: 0.2, 0.6, 0.4, 1
+                                    size_hint: None, None
+                                    size: 24, 24
+                                    pos_hint: {'center_y': 0.5}
+                                    x: self.parent.x + 15
+                                    canvas.before:
+                                        PushMatrix
+                                        Scale:
+                                            x: -1 if self.parent.state == 'down' else 1
+                                            y: 1
+                                            origin: self.center
+                                    canvas.after:
+                                        PopMatrix
 
                 # -----------------------------------------------------
                 # 4. Reset Password View
@@ -444,12 +522,51 @@
                                 bold: True
                                 on_release: root.reset_password()
 
+                            # Modern Back Button with Icon
                             Button:
-                                text: "← Back to Login"
-                                size_hint_y: None
-                                height: 40
+                                text: "  Back to Login"
+                                size_hint: 1, None
+                                height: 48
                                 background_normal: ""
-                                background_color: 0, 0, 0, 0
-                                color: 0.18, 0.34, 0.82, 1
-                                font_size: 17
+                                background_color: 0.96, 0.96, 0.98, 1
+                                background_down: ""
+                                color: 0.2, 0.6, 0.4, 1
+                                font_size: '16sp'
+                                # Using system default font with fallback
+                                bold: True
                                 on_release: root.screen_switch("login_view")
+                                canvas.before:
+                                    Color:
+                                        rgba: (0.2, 0.6, 0.4, 0.1) if self.state == 'normal' else (0.2, 0.6, 0.4, 0.2)
+                                    RoundedRectangle:
+                                        size: self.size
+                                        pos: self.pos
+                                        radius: [8, 8, 8, 8]
+                                canvas.after:
+                                    Color:
+                                        rgba: 0.2, 0.6, 0.4, 1
+                                    Line:
+                                        rounded_rectangle: [self.x, self.y, self.width, self.height, 8]
+                                        width: 1.5
+                                    Triangle:
+                                        points: [self.x + 10, self.y + self.height/2 + 4, self.x + 20, self.y + self.height/2 - 6, self.x + 20, self.y + self.height/2 + 14]
+                                        
+                                # Add left arrow icon using unicode
+                                Label:
+                                    text: "←"  # Standard left arrow
+                                    # Using default font for Material Icons
+                                    # Make sure the font file exists at the specified path
+                                    font_size: '24sp'
+                                    color: 0.2, 0.6, 0.4, 1
+                                    size_hint: None, None
+                                    size: 24, 24
+                                    pos_hint: {'center_y': 0.5}
+                                    x: self.parent.x + 15
+                                    canvas.before:
+                                        PushMatrix
+                                        Scale:
+                                            x: -1 if self.parent.state == 'down' else 1
+                                            y: 1
+                                            origin: self.center
+                                    canvas.after:
+                                        PopMatrix

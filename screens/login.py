@@ -164,62 +164,79 @@ class LoginSignupScreen(Screen):
             # First time, no users exist, force Signup
             self.ids.login_views.current = 'signup_view'
 
-    #! validate  krega login credentials and redirect based on role
+    #! validate login credentials and redirect based on role
     def validate_login(self):
-        role = self.selected_role.lower()
-        password = self.ids.password_input.text.strip()
-
-        # 🌟 CHANGE 1: Login ID Field based on role
-        if role == 'user':
-            login_id = self.ids.user_id_input.text.strip() # User login by User ID
-            lookup_field = "user_id"
-        else:
-            # For Doctor/Patient/Admin, assuming they also login with a fixed User ID field (no Aadhaar)
+        conn = None
+        stored_role = None
+        try:
+            role = self.selected_role.lower()
+            password = self.ids.password_input.text.strip()
             login_id = self.ids.user_id_input.text.strip()
-            lookup_field = "user_id"
 
-        #! --- Developer Admin Login (Direct Access without DB) ---
-        if login_id == "UPTHAD00" and password == "admin2003" and role == "admin":
-            self.manager.current = "admin"
-            return
+            # Developer Admin Login (Direct Access without DB)
+            if login_id == "UPTHAD00" and password == "admin2003" and role == "admin":
+                self.manager.current = "admin_home"
+                return
 
-        if not login_id or not password or role not in ['user', 'admin', 'doctor', 'patient']:
-            self.show_popup("Error", "Please fill all details.")
-            return
+            if not login_id or not password or role not in ['user', 'admin', 'doctor', 'patient']:
+                self.show_popup("Error", "Please fill all details.")
+                return
 
-        conn = sqlite3.connect("users.db")
-        cursor = conn.cursor()
+            try:
+                conn = sqlite3.connect("users.db")
+                cursor = conn.cursor()
 
-        # 🌟 CHANGE 2: Look up by user_id instead of aadhaar
-        cursor.execute(f"SELECT password, role FROM users WHERE {lookup_field}=?", (login_id,))
-        result = cursor.fetchone()
+                # Look up by user_id
+                cursor.execute("SELECT password, role, user_id FROM users WHERE user_id=?", (login_id,))
+                result = cursor.fetchone()
 
-        if result is None:
-            # 🌟 CHANGE 3: Changed error message
-            self.show_popup("Error", f"{role.capitalize()} ID not found.")
-        else:
-            stored_password, stored_role = result
-
-            if stored_password == password:
-                if stored_role.lower() != role:
-                    self.show_popup("Error", "You do not have permission for this role.")
-                    conn.close()
+                if result is None:
+                    self.show_popup("Error", f"{role.capitalize()} ID not found.")
                     return
+                    
+                stored_password, stored_role, user_id = result
 
-                #! Redirect based on role
-                r = stored_role.lower()
-                if r == 'patient':
-                    self.manager.current = 'patient'
-                elif r == 'doctor':
-                    self.manager.current = 'doctor'
-                elif r == 'admin':
-                    self.manager.current = 'admin'
-                elif r == 'user':
-                    self.manager.current = 'dashboard'
-            else:
+                if stored_password == password:
+                    if stored_role.lower() != role:
+                        self.show_popup("Error", "You do not have permission for this role.")
+                        return
+
+                    # Set current user and redirect based on role
+                    from kivy.app import App
+                    app = App.get_running_app()
+                    if not hasattr(app, 'current_user'):
+                        app.current_user = {}
+                    app.current_user.update({
+                        'user_id': user_id,
+                        'role': stored_role.lower()
+                    })
+
+                    if stored_role.lower() == 'user':
+                        self.manager.current = 'dashboard'
+                        return
+                    elif stored_role.lower() == 'doctor':
+                        self.manager.current = 'doctor_dashboard'
+                        return
+                    elif stored_role.lower() == 'patient':
+                        self.manager.current = 'patient_dashboard'
+                        return
+                    elif stored_role.lower() == 'admin':
+                        self.manager.current = 'admin_home'
+                        return
+                
                 self.show_popup("Error", "Incorrect password.")
-        
-        conn.close()
+
+            except Exception as e:
+                print(f"Database error: {str(e)}")
+                self.show_popup("Error", "An error occurred while accessing the database.")
+                return
+
+        except Exception as e:
+            print(f"Login error: {str(e)}")
+            self.show_popup("Error", "An error occurred during login. Please try again.")
+        finally:
+            if conn:
+                conn.close()
 
     #! validate krega signup details and store in database
     def validate_signup(self):
